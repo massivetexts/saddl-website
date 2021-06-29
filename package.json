@@ -1,0 +1,27 @@
+{
+  "name": "Similarities",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "svelte-kit dev",
+    "build": "svelte-kit build",
+    "preview": "svelte-kit preview",
+    "lint": "eslint --ignore-path .gitignore ."
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-node": "^1.0.0-next.29",
+    "@sveltejs/kit": "next",
+    "aws-sdk": "^2.932.0",
+    "duckdb": "^0.2.7",
+    "eslint": "^7.22.0",
+    "eslint-plugin-svelte3": "^3.2.0",
+    "mock-aws-s3": "^4.0.2",
+    "nock": "^13.1.0",
+    "svelte": "^3.34.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@fontsource/fira-mono": "^4.2.2",
+    "@lukeed/uuid": "^2.0.0",
+    "cookie": "^0.4.1"
+  }
+}
