@@ -2,6 +2,12 @@
 node_modules
 /.svelte-kit
 /package
+db-export
+
+# Duckdb in root folder
+*.duckdb
+*.wal
+
 # Logs
 logs
 *.log
