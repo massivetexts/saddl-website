@@ -17,15 +17,15 @@ function run_query(con, query) {
 }
 
 export async function metadata(id) {
-  const query = `SELECT * FROM "hathifiles" WHERE "htid"='${id}' LIMIT 1;`;
+  const query = `SELECT * FROM "meta" WHERE "htid"='${id}' LIMIT 1;`;
   const val = run_query(con, query);
   return {body: JSON.stringify((await val)[0])}
 }
 
 export async function random_books() {
   const query = `
-  SELECT htid, "title", "hathifiles"."author" author FROM
-  "hathifiles" WHERE RANDOM() < .01 AND EXISTS(SELECT "left" FROM relationships b WHERE b."left" = hathifiles.htid)
+  SELECT htid, "title", "meta"."author" author FROM
+  "meta" WHERE RANDOM() < .001 AND EXISTS(SELECT "target" FROM clean_predictions b WHERE b."target" = meta.htid)
    LIMIT 20`;
   const val = run_query(con, query);
   return {body: JSON.stringify(await val)}
@@ -35,7 +35,7 @@ export async function random_books() {
 
 
 export async function neighbors(id) {
-  const query = `SELECT * FROM "hathifiles" INNER JOIN "relationships" ON ("hathifiles"."htid" = "relationships"."right") WHERE "left"='${id}';`;
+  const query = `SELECT * FROM "meta" INNER JOIN "clean_predictions" ON (meta.htid = clean_predictions.target) WHERE "target"='${id}';`;
   const val = run_query(con, query);
   return {body: JSON.stringify(await val)}
 }
