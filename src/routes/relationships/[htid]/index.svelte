@@ -1,29 +1,31 @@
 <script context="module">
-  export async function load({ page, fetch }) {
-    const url = `/relationships/${page.params.htid}.json`;
-    try {
-      const res = await fetch(url);
-      const dat = res.json();
-      return {
-        props: {
-          relationships: dat,
-        },
-      };
-    } catch {
-      return {
-        //        status: res.status,
-        error: new Error(`Could not load ${url}`),
-      };
-    }
-  }
+
 </script>
 
 <script>
-  export let relationships;
+
   import { page } from "$app/stores";
+  import { Circle2 } from 'svelte-loading-spinners';
+  import { onMount } from 'svelte'
+  // An encoded URI component.
+
+  const htid = $page.params.htid;
+
+  //empty promises.
+  let relationships = new Promise(() => {})
+  let work_data = new Promise(() => {})
+
+  onMount(() => {
+    // Can't run until page is mounted.
+    relationships = fetch(`/relationships/${htid}.json`).then(d => d.json())
+    work_data = fetch(`/catalog/${htid}.json`).then((d) => d.json())
+  })
+
+  const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="))
 
   const organized = {};
-  relationships.then((vals) => {
+
+   $ : relationships.then((vals) => {
     console.log(vals);
     vals.sort((a, b) => b.relatedness - a.relatedness);
     for (let rel of vals) {
@@ -40,22 +42,19 @@
       organized[guess].push(rel);
     }
   });
-  const work_data = fetch(`/catalog/${$page.params.htid}.json`).then((d) =>
-    d.json()
-  );
 </script>
 
 {#await work_data}
-  <h1 />
+  <Circle2 />
 {:then metadata}
   <h1>{metadata.title}</h1>
   {metadata.author}
 {/await}
 
-<a href="/catalog/{$page.params.htid}/"> Catalog page</a>
+<a href="/catalog/${encode(htid)}/"> Catalog page</a>
 
 {#await relationships}
-  Waiting
+  <Circle2 />
 {:then}
   <ul>
     {#each Object.keys(organized) as k}
@@ -64,7 +63,7 @@
         <ul>
           {#each organized[k] as rel}
             <li>
-              <a href="/catalog/{rel.htid}">{rel.title} - {rel.htid}</a>
+              <a href="/catalog/{encode(rel.htid)}">{rel.title} - {rel.htid}</a>
             </li>
           {/each}
         </ul>
