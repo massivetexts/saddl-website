@@ -7,10 +7,13 @@
 </script>
 
 <svelte:head>
+
 	<title>Home</title>
+
 </svelte:head>
 
 <section>
+
 	<h1>
 		<div class="welcome">
 			Hathi Trust Similarities
@@ -18,7 +21,10 @@
 	</h1>
 
 	<h2>
+
 		This is a Svelte-kit app serving a duckdb database from Ben's home computer.
+		I am retyping the data here. It refreshes on its own.
+
 	</h2>
 
 </section>

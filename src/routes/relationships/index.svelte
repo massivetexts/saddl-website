@@ -1,43 +1,33 @@
 <script context="module">
-	/**
-	 * @type {import('@sveltejs/kit').Load}
-	 */
-	export async function load({ page, fetch }) {
-		const url = `/relationships/random.json`;
-		const res = await fetch(url);
-    try {
-      const dat = res.json()
-      return {
-        props: {
-          my_ids: dat
-        }
-      };
-    } catch {
-      return {
-        status: res.status,
-        error: new Error(`Could not load ${url}`)
-      };
-    }
-	}
-
 </script>
 
 <script>
+import { onMount } from "svelte";
+import { Circle2 } from 'svelte-loading-spinners';
+const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="))
 
-export let my_ids;
 
+let my_ids = undefined;
+onMount( () => {
+  const url = "/relationships/random.json";
+  my_ids = fetch(url)
+  .then(
+    response => response.json()
+  );
+})
 </script>
 
 <h1>Random Relationships</h1>
 
 For now, I'm just fetching a bunch of random HTIDs.
-
+{#if my_ids}
 {#await my_ids}
-	Waiting
+	<Circle2></Circle2>
 {:then id_list}
 	{#each id_list as id}
-    <a href="/relationships/{id.htid}/">    
+    <a href="/relationships/{encode(id.htid)}/">    
       {id.title} - {id.author}
     </a>
     {/each}
 {/await}
+{/if}
