@@ -48,7 +48,7 @@
 {#await work_data}
   <h1 />
 {:then metadata}
-  <h1>{metadata.title}</h1>
+  <h1>{metadata.title} ({metadata.description})</h1>
   {metadata.author}
 {/await}
 
@@ -64,7 +64,9 @@
         <ul>
           {#each organized[k] as rel}
             <li>
-              <a href="/catalog/{rel.htid}">{rel.title} - {rel.htid}</a>
+              <a href="/catalog/{rel.htid}">
+                {rel.title} ({rel.description}) - {rel.htid}
+              </a>
             </li>
           {/each}
         </ul>
