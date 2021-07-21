@@ -4,7 +4,8 @@
 
 <header>
   <div class="corner">
-    <span class="bighead">SaDDL</span><span class="subhead">Similarities and Duplicates in Digital Libraries</span>
+    <span class="bighead"><a href="/">SaDDL</a></span>
+    <span class="subhead">Similarities and Duplicates in Digital Libraries</span>
   </div>
 
   <nav class="navbar">
@@ -14,6 +15,12 @@
       </li>
       <li class="navbar-item" class:active={$page.path === "/relationships"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships">Relationships</a>
+      </li>
+      <li class="navbar-item" class:active={$page.path === "/work"}>
+        <a class="navbar-link" sveltekit:prefetch href="/work">Work</a>
+      </li>
+      <li class="navbar-item" class:active={$page.path === "/manifestation"}>
+        <a class="navbar-link" sveltekit:prefetch href="/manifestation">Manifestation</a>
       </li>
     </ul>
   </nav>
@@ -32,6 +39,10 @@
     color: #777;
     font-size: 15px;
   }
+  .bighead a {
+    text-decoration: none;
+    color: black;
+  }
   .bighead {
     font-size: 20px;
     text-shadow: -1px -1px;
@@ -44,6 +55,7 @@
     height: 3.5rem;
     background: #fff;
     z-index: 99;
+    margin-bottom: 10px;
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
   }
