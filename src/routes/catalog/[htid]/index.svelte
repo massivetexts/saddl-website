@@ -23,14 +23,13 @@ onMount(() => {
 <h1>
 
 </h1>
+<a href="/relationships/{htid}">Relationships</a>
 
 {#await lookup_list}
 	<Circle2 />
 {:then hathifiles_info}
 	<details>
-
 	<summary>{hathifiles_info.author}, {hathifiles_info.title}</summary>
-
 	<dl>
 		{#each Object.keys(hathifiles_info) as k}
 			<dt>{k}</dt>

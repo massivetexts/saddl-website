@@ -1,45 +1,21 @@
 <script>
-	import Header from '$lib/Header/index.svelte';
-	import '../app.css';
+  import Header from "$lib/Header/index.svelte";
+  import "../app.css";
 </script>
 
 <Header />
 
 <main>
-	<slot />
+  <slot />
 </main>
 
 <footer>
-	<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+  <p>SaDDL is funded by <a href="https://www.imls.gov/grants/awarded/lg-86-18-0061-18-0">IMLS #LG-86-18-0061-18.</a></p>
 </footer>
 
 <style>
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 1024px;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 40px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 40px 0;
-		}
-	}
+  footer {
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }
 </style>

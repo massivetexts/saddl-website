@@ -1,9 +1,7 @@
 <script context="module">
-
 </script>
 
 <script>
-
   import { page } from "$app/stores";
   import { Circle2 } from 'svelte-loading-spinners';
   import { onMount } from 'svelte'
@@ -12,16 +10,16 @@
   const htid = $page.params.htid;
 
   //empty promises.
-  let relationships = new Promise(() => {})
-  let work_data = new Promise(() => {})
+  let relationships = new Promise(() => {});
+  let work_data = new Promise(() => {});
 
   onMount(() => {
     // Can't run until page is mounted.
-    relationships = fetch(`/relationships/${htid}.json`).then(d => d.json())
-    work_data = fetch(`/catalog/${htid}.json`).then((d) => d.json())
-  })
+    relationships = fetch(`/relationships/${htid}.json`).then((d) => d.json());
+    work_data = fetch(`/catalog/${htid}.json`).then((d) => d.json());
+  });
 
-  const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="))
+  const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="));
 
   const organized = {};
 
@@ -55,7 +53,7 @@
 {#await work_data}
   <Circle2 />
 {:then metadata}
-  <h1>{metadata.title}</h1>
+  <h1>{metadata.title} ({metadata.description})</h1>
   {metadata.author}
 {/await}
 
@@ -71,7 +69,9 @@
         <ul>
           {#each organized[k] as rel}
             <li>
-              <a href="/catalog/{encode(rel.htid)}">{rel.title} - {rel.htid}</a>
+              <a href="/catalog/{rel.htid}">
+                {rel.title} ({rel.description}) - {rel.htid}
+              </a>
             </li>
           {/each}
         </ul>
