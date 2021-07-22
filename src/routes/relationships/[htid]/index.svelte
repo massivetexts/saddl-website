@@ -7,8 +7,8 @@
   import { page } from "$app/stores";
   import { Circle2 } from 'svelte-loading-spinners';
   import { onMount } from 'svelte'
+  import { median_string } from '$lib/levenshtein'
   // An encoded URI component.
-
   const htid = $page.params.htid;
 
   //empty promises.
@@ -26,13 +26,13 @@
   const organized = {};
 
    $ : relationships.then((vals) => {
-    console.log(vals);
     vals.sort((a, b) => b.relatedness - a.relatedness);
     for (let rel of vals) {
       // prettier-ignore
       let probs = (function({ swsm, swde, wp_dv, partof, contains, OVERLAPS, simdiff, grsim, randdiff }) {
         return {swsm, swde, wp_dv, partof, contains, OVERLAPS, simdiff, grsim, randdiff }
       })(rel);
+
       let guess = Object.keys(probs).reduce((x, y) =>
         probs[x] > probs[y] ? x : y
       );
@@ -41,7 +41,15 @@
       }
       organized[guess].push(rel);
     }
+
+    for (let key of Object.keys(organized)) {
+      if (organized[key].length > 1) {
+        organized[key].repr = median_string(organized[key].map(x => x.title));
+      }
+    }
+
   });
+
 </script>
 
 {#await work_data}
@@ -51,7 +59,7 @@
   {metadata.author}
 {/await}
 
-<a href="/catalog/${encode(htid)}/"> Catalog page</a>
+<a href="/catalog/{encode(htid)}/"> Catalog page</a>
 
 {#await relationships}
   <Circle2 />
@@ -59,7 +67,7 @@
   <ul>
     {#each Object.keys(organized) as k}
       <li>
-        {k}
+        {k} {organized[k].repr ? organized[k].repr : organized[k][0].title}
         <ul>
           {#each organized[k] as rel}
             <li>

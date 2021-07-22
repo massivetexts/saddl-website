@@ -8,6 +8,7 @@ const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="))
 
 
 function run_query(con, query) {
+  // Wraps a query as a promise.
   return new Promise((resolve, reject) => {
       con.all(query, function(err, res = undefined) {
         if (err) {
@@ -35,9 +36,7 @@ export async function random_books() {
   WHERE RANDOM() < .001 AND EXISTS(SELECT "target" FROM clean_predictions b WHERE b."target" = meta.htid)
   LIMIT 20`;
   const val = await run_query(con, query);
-
   return {body: JSON.stringify(await val)}
-
 }
 
 
