@@ -24,6 +24,7 @@ For now, I'm just fetching a bunch of random HTIDs.
   {#await my_ids}
     <Circle2 />
   {:then id_list}
+    <hr />
     {#each { length: Math.ceil(id_list.length / 3) } as _, i}
       <div class="row">
         <VolumeCard meta={id_list[i * 3]} />
@@ -35,5 +36,6 @@ For now, I'm just fetching a bunch of random HTIDs.
         {/if}
       </div>
     {/each}
+    <hr />
   {/await}
 {/if}

@@ -16,17 +16,20 @@
       <li class="navbar-item" class:active={$page.path === "/relationships"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships">Relationships</a>
       </li>
+      <!--TODO #1 Add Work page-->
       <li class="navbar-item" class:active={$page.path === "/work"}>
         <a class="navbar-link" sveltekit:prefetch href="/work">Work</a>
       </li>
+      <!--TODO #2 Add manifestation page-->
       <li class="navbar-item" class:active={$page.path === "/manifestation"}>
         <a class="navbar-link" sveltekit:prefetch href="/manifestation">Manifestation</a>
       </li>
+      <!--TODO #4 Add About page -->
     </ul>
   </nav>
 
   <div class="corner">
-    <!-- TODO put something else here? github link? -->
+    <!-- TODO #3 Add search box -->
   </div>
 </header>
 

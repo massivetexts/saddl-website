@@ -39,9 +39,10 @@ export async function random_books() {
 }
 
 export async function neighbors(id) {
-  const query = `SELECT * FROM "meta" INNER JOIN "clean_predictions" ON (meta.htid = clean_predictions.candidate) WHERE "target"='${decode(
-    id
-  )}';`;
+  const query = `SELECT *
+  FROM clean_predictions 
+  INNER JOIN meta ON (meta.htid = clean_predictions.candidate) 
+  WHERE "target"='${decode(id)}';`;
   const val = run_query(con, query);
   return { body: JSON.stringify(await val) };
 }
