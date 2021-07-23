@@ -22,10 +22,7 @@
 
 	<h2>
 
-		This is a Svelte-kit app serving a duckdb database from Ben's home computer.
-		I am retyping the data here. It refreshes on its own.
-
-	</h2>
+		This is a Svelte-kit app.
 
 </section>
 

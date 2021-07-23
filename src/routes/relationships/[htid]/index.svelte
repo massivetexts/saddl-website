@@ -6,6 +6,7 @@
   import { Circle2 } from 'svelte-loading-spinners';
   import { onMount } from 'svelte'
   import { median_string } from '$lib/levenshtein'
+  import  Slugset  from '$lib/Slugset.svelte'
   // An encoded URI component.
   const htid = $page.params.htid;
 
@@ -62,20 +63,17 @@
 {#await relationships}
   <Circle2 />
 {:then}
-  <ul>
+  <div id="relationlist" display="flex">
     {#each Object.keys(organized) as k}
-      <li>
-        {k} {organized[k].repr ? organized[k].repr : organized[k][0].title}
-        <ul>
-          {#each organized[k] as rel}
-            <li>
-              <a href="/catalog/{rel.htid}">
-                {rel.title} ({rel.description}) - {rel.htid}
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </li>
+      <Slugset 
+        items={organized[k]} 
+        title = {k + organized[k].repr ? organized[k].repr : organized[k][0].title} />
     {/each}
-  </ul>
+  </div>
 {/await}
+
+<style>
+  #relationlist {
+    flex-wrap: wrap;
+  }
+</style>
