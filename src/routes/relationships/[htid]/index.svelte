@@ -3,10 +3,11 @@
 
 <script>
   import { page } from "$app/stores";
-  import { Circle2 } from "svelte-loading-spinners";
-  import { onMount } from "svelte";
+  import { Circle2 } from 'svelte-loading-spinners';
+  import { onMount } from 'svelte'
+  import { median_string } from '$lib/levenshtein'
+  import  Slugset  from '$lib/Slugset.svelte'
   // An encoded URI component.
-
   const htid = $page.params.htid;
 
   //empty promises.
@@ -23,14 +24,14 @@
 
   const organized = {};
 
-  $: relationships.then((vals) => {
-    console.log(vals);
+   $ : relationships.then((vals) => {
     vals.sort((a, b) => b.relatedness - a.relatedness);
     for (let rel of vals) {
       // prettier-ignore
       let probs = (function({ swsm, swde, wp_dv, partof, contains, OVERLAPS, simdiff, grsim, randdiff }) {
         return {swsm, swde, wp_dv, partof, contains, OVERLAPS, simdiff, grsim, randdiff }
       })(rel);
+
       let guess = Object.keys(probs).reduce((x, y) =>
         probs[x] > probs[y] ? x : y
       );
@@ -39,7 +40,15 @@
       }
       organized[guess].push(rel);
     }
+
+    for (let key of Object.keys(organized)) {
+      if (organized[key].length > 1) {
+        organized[key].repr = median_string(organized[key].map(x => x.title));
+      }
+    }
+
   });
+
 </script>
 
 {#await work_data}
@@ -49,25 +58,22 @@
   {metadata.author}
 {/await}
 
-<a href="/catalog/${encode(htid)}/"> Catalog page</a>
+<a href="/catalog/{encode(htid)}/"> Catalog page</a>
 
 {#await relationships}
   <Circle2 />
 {:then}
-  <ul>
+  <div id="relationlist" display="flex">
     {#each Object.keys(organized) as k}
-      <li>
-        {k}
-        <ul>
-          {#each organized[k] as rel}
-            <li>
-              <a href="/catalog/{rel.htid}">
-                {rel.title} ({rel.description}) - {rel.htid}
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </li>
+      <Slugset 
+        items={organized[k]} 
+        title = {k + organized[k].repr ? organized[k].repr : organized[k][0].title} />
     {/each}
-  </ul>
+  </div>
 {/await}
+
+<style>
+  #relationlist {
+    flex-wrap: wrap;
+  }
+</style>

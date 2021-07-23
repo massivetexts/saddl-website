@@ -7,6 +7,7 @@ function decode(str) {
 const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="));
 
 function run_query(con, query) {
+  // Wraps a query as a promise.
   return new Promise((resolve, reject) => {
     con.all(query, function (err, res = undefined) {
       if (err) {

@@ -4,6 +4,7 @@
 <script>
   import { onMount } from "svelte";
   import { Circle2 } from "svelte-loading-spinners";
+  import Slugset from "$lib/Slugset.svelte";
   import VolumeCard from "$lib/VolumeCard.svelte";
 
   let my_ids = undefined;
@@ -37,5 +38,6 @@ For now, I'm just fetching a bunch of random HTIDs.
       </div>
     {/each}
     <hr />
+    <Slugset items={id_list} />
   {/await}
 {/if}
