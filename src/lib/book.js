@@ -47,3 +47,17 @@ export async function neighbors(id) {
   const val = run_query(con, query);
   return { body: JSON.stringify(await val) };
 }
+
+export async function random_work_listing() {
+  // Right now, this uses the first htid for the work listing. Eventually
+  // we can use the 'best' copy or an inferred 'most common title'
+  const query = `
+  SELECT work_stats.work_id, label_count, title, author, description, rights_date_used 
+  FROM work_stats
+  LEFT JOIN clusters on clusters.work_id == work_stats.work_id
+  INNER JOIN meta ON clusters.htid == meta.htid
+  WHERE gov_prop < 0.5 AND serial_prop <0.5 AND label_count > 2
+  LIMIT 5;`;
+  const val = run_query(con, query);
+  return { body: JSON.stringify(await val) };
+}
