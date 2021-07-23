@@ -10,11 +10,10 @@
     </strong>
   </p>
   <ul>
-    <li>{meta.description}</li>
-    <li>{meta.author}</li>
+    <li>Description:{meta.description}</li>
+    <li>Author: {meta.author}</li>
   </ul>
 </div>
 
 <style>
-  
 </style>

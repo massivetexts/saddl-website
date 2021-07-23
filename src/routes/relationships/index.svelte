@@ -26,18 +26,7 @@ For now, I'm just fetching a bunch of random HTIDs.
     <Circle2 />
   {:then id_list}
     <hr />
-    {#each { length: Math.ceil(id_list.length / 3) } as _, i}
-      <div class="row">
-        <VolumeCard meta={id_list[i * 3]} />
-        {#if i * 3 + 1 < id_list.length}
-          <VolumeCard meta={id_list[i * 3 + 1]} />
-        {/if}
-        {#if i * 3 + 2 < id_list.length}
-          <VolumeCard meta={id_list[i * 3 + 2]} />
-        {/if}
-      </div>
-    {/each}
-    <hr />
     <Slugset items={id_list} />
+    <hr />
   {/await}
 {/if}
