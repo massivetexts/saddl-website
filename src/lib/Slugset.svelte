@@ -12,7 +12,7 @@
     {#each { length: col_count } as _, j}
       {#if i * col_count + j < items.length}
         {#if level === "volume"}
-          <VolumeCard meta={items[i * col_count]} />
+          <VolumeCard meta={items[i * col_count + j]} />
         {:else}
           <p>This level not implemented yet.</p>
         {/if}
