@@ -7,14 +7,23 @@ function decode(str) {
 const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="));
 
 function run_query(con, query) {
+  // TODO add support for parameterized queries for safety
+  // docs here: https://node-postgres.com/features/queries#parameterized-query
   // Wraps a query as a promise.
+  console.log("Running query: " + query);
+  //return con.query(query).then((res) => console.log(res.rows));
+
   return new Promise((resolve, reject) => {
-    con.all(query, function (err, res = undefined) {
+    // For Duckdb, this should be con.all
+    // for postgres, wrapping in a new promise is unecessary (?) because it
+    // has promises built in, but I didn't want to deviate too far from OG code.
+    con.query(query, function (err, res = undefined) {
       if (err) {
         reject(err);
       }
-      if (res && res.length) {
-        resolve(res);
+      if (res && res.rows && res.rows.length) {
+        console.log(res.rows);
+        resolve(res.rows);
       } else {
         reject("query failed.");
       }
@@ -54,8 +63,8 @@ export async function random_work_listing() {
   const query = `
   SELECT work_stats.work_id, label_count, title, author, description, rights_date_used 
   FROM work_stats
-  LEFT JOIN clusters on clusters.work_id == work_stats.work_id
-  INNER JOIN meta ON clusters.htid == meta.htid
+  LEFT JOIN clusters ON clusters.work_id = work_stats.work_id
+  INNER JOIN meta ON clusters.htid = meta.htid
   WHERE gov_prop < 0.5 AND serial_prop <0.5 AND label_count > 2
   LIMIT 5;`;
   const val = run_query(con, query);
