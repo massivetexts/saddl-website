@@ -16,14 +16,4 @@ export const con = client;
 /*
 import duckdb from "duckdb";
 const db = new duckdb.Database("/drobo/saddl/dataset/saddl.duckdb");
-db.all("CREATE INDEX htid_idx ON meta (htid);", function (err, res) {
-  if (err) {
-    throw err;
-  }
-});
-db.all("CREATE INDEX target_idx ON clean_predictions (target);", function (err, res) {
-  if (err) {
-    throw err;
-  }
-});
 export const con = db.connect();*/

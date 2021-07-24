@@ -6,23 +6,17 @@ function decode(str) {
 
 const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="));
 
-function run_query(con, query) {
-  // TODO add support for parameterized queries for safety
-  // docs here: https://node-postgres.com/features/queries#parameterized-query
+function run_query(con, query, params = []) {
   // Wraps a query as a promise.
-  console.log("Running query: " + query);
-  //return con.query(query).then((res) => console.log(res.rows));
-
   return new Promise((resolve, reject) => {
     // For Duckdb, this should be con.all
     // for postgres, wrapping in a new promise is unecessary (?) because it
     // has promises built in, but I didn't want to deviate too far from OG code.
-    con.query(query, function (err, res = undefined) {
+    con.query(query, params, function (err, res = undefined) {
       if (err) {
         reject(err);
       }
       if (res && res.rows && res.rows.length) {
-        console.log(res.rows);
         resolve(res.rows);
       } else {
         reject("query failed.");
@@ -32,8 +26,9 @@ function run_query(con, query) {
 }
 
 export async function metadata(id) {
-  const query = `SELECT * FROM "meta" WHERE "htid"='${decode(id)}' LIMIT 1;`;
-  const val = run_query(con, query);
+  const query = `SELECT * FROM "meta" WHERE "htid"=$1 LIMIT 1;`;
+  const params = [decode(id)];
+  const val = run_query(con, query, params);
   return { body: JSON.stringify((await val)[0]) };
 }
 
@@ -52,8 +47,9 @@ export async function neighbors(id) {
   const query = `SELECT *
   FROM clean_predictions 
   INNER JOIN meta ON (meta.htid = clean_predictions.candidate) 
-  WHERE "target"='${decode(id)}';`;
-  const val = run_query(con, query);
+  WHERE "target"=$1;`;
+  const params = [decode(id)];
+  const val = run_query(con, query, params);
   return { body: JSON.stringify(await val) };
 }
 
