@@ -1,6 +1,6 @@
 <script>
   export let meta;
-  const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="));
+  import { encode } from "$lib/utils.js";
 </script>
 
 <div class="four columns">

@@ -1,10 +1,5 @@
 import { con } from "./database.js";
-
-function decode(str) {
-  return decodeURIComponent(str).replaceAll("====", "/");
-}
-
-const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="));
+import { decode, encode } from "./utils.js";
 
 function run_query(con, query, params = []) {
   // Wraps a query as a promise.
@@ -28,7 +23,9 @@ function run_query(con, query, params = []) {
 export async function metadata(id, level = "htid") {
   let query;
   if (level === "htid") {
-    query = `SELECT * FROM "meta" WHERE "htid"=$1 LIMIT 1;`;
+    query = `SELECT * FROM meta
+    JOIN clusters ON clusters.htid = meta.htid
+    WHERE clusters.htid=$1;`;
   } else {
     // how do you throw any error properly?
   }
