@@ -52,7 +52,7 @@ export async function neighbors(id) {
   WHERE "target"=$1;`;
   const params = [decode(id)];
   const val = run_query(con, query, params);
-  return { body: JSON.stringify(await val) };
+  return await val;
 }
 
 export async function random_work_listing() {

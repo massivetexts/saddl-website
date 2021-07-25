@@ -10,8 +10,9 @@
     </strong>
   </p>
   <ul>
-    <li>Description:{meta.description}</li>
-    <li>Author: {meta.author}</li>
+    {#if meta.description}<li>Description:{meta.description}</li>{/if}
+    {#if meta.author}<li>Author: {meta.author}</li>{/if}
+    {#if meta.confidence}<li>Confidence: {Math.round(meta.confidence * 100)}% ⬤</li>{/if}
   </ul>
 </div>
 
