@@ -25,8 +25,13 @@ function run_query(con, query, params = []) {
   });
 }
 
-export async function metadata(id) {
-  const query = `SELECT * FROM "meta" WHERE "htid"=$1 LIMIT 1;`;
+export async function metadata(id, level = "htid") {
+  let query;
+  if (level === "htid") {
+    query = `SELECT * FROM "meta" WHERE "htid"=$1 LIMIT 1;`;
+  } else {
+    // how do you throw any error properly?
+  }
   const params = [decode(id)];
   const val = run_query(con, query, params);
   return { body: JSON.stringify((await val)[0]) };
@@ -62,7 +67,8 @@ export async function random_work_listing() {
   LEFT JOIN clusters ON clusters.work_id = work_stats.work_id
   INNER JOIN meta ON clusters.htid = meta.htid
   WHERE gov_prop < 0.5 AND serial_prop <0.5 AND label_count > 2
-  LIMIT 5;`;
+    AND RANDOM() < .0005
+  LIMIT 20;`;
   const val = run_query(con, query);
   return { body: JSON.stringify(await val) };
 }

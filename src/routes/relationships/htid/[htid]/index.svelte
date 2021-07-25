@@ -3,10 +3,10 @@
 
 <script>
   import { page } from "$app/stores";
-  import { Circle2 } from 'svelte-loading-spinners';
-  import { onMount } from 'svelte'
-  import { median_string } from '$lib/levenshtein'
-  import  Slugset  from '$lib/Slugset.svelte'
+  import { Circle2 } from "svelte-loading-spinners";
+  import { onMount } from "svelte";
+  import { median_string } from "$lib/levenshtein";
+  import Slugset from "$lib/Slugset.svelte";
   // An encoded URI component.
   const htid = $page.params.htid;
 
@@ -16,15 +16,15 @@
 
   onMount(() => {
     // Can't run until page is mounted.
-    relationships = fetch(`/relationships/${htid}.json`).then((d) => d.json());
-    work_data = fetch(`/catalog/${htid}.json`).then((d) => d.json());
+    relationships = fetch(`/relationships/htid/${htid}.json`).then((d) => d.json());
+    work_data = fetch(`/catalog/htid/${htid}.json`).then((d) => d.json());
   });
 
   const encode = (str) => encodeURIComponent(str.replaceAll("/", "===="));
 
   const organized = {};
 
-   $ : relationships.then((vals) => {
+  $: relationships.then((vals) => {
     vals.sort((a, b) => b.relatedness - a.relatedness);
     for (let rel of vals) {
       // prettier-ignore
@@ -32,9 +32,7 @@
         return {swsm, swde, wp_dv, partof, contains, OVERLAPS, simdiff, grsim, randdiff }
       })(rel);
 
-      let guess = Object.keys(probs).reduce((x, y) =>
-        probs[x] > probs[y] ? x : y
-      );
+      let guess = Object.keys(probs).reduce((x, y) => (probs[x] > probs[y] ? x : y));
       if (!organized[guess]) {
         organized[guess] = [];
       }
@@ -43,12 +41,10 @@
 
     for (let key of Object.keys(organized)) {
       if (organized[key].length > 1) {
-        organized[key].repr = median_string(organized[key].map(x => x.title));
+        organized[key].repr = median_string(organized[key].map((x) => x.title));
       }
     }
-
   });
-
 </script>
 
 {#await work_data}
@@ -58,16 +54,14 @@
   {metadata.author}
 {/await}
 
-<a href="/catalog/{encode(htid)}/"> Catalog page</a>
+<a href="/catalog/htid/{encode(htid)}/"> Catalog page</a>
 
 {#await relationships}
   <Circle2 />
 {:then}
   <div id="relationlist" display="flex">
     {#each Object.keys(organized) as k}
-      <Slugset 
-        items={organized[k]} 
-        title = {k + organized[k].repr ? organized[k].repr : organized[k][0].title} />
+      <Slugset items={organized[k]} title={k + organized[k].repr ? organized[k].repr : organized[k][0].title} />
     {/each}
   </div>
 {/await}

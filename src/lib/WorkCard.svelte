@@ -6,10 +6,11 @@
 <div class="four columns">
   <p>
     <strong>
-      <a href="/relationships/htid/{encode(meta.htid)}/"> {meta.title} ({meta.rights_date_used})</a>
+      <a href="/relationships/work/{encode(meta.work_id.toString())}/"> {meta.title} ({meta.rights_date_used})</a>
     </strong>
   </p>
   <ul>
+    <li># of volumes in this work: {meta.label_count}</li>
     <li>Description:{meta.description}</li>
     <li>Author: {meta.author}</li>
   </ul>

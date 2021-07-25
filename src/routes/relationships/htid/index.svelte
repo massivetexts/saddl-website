@@ -8,7 +8,7 @@
 
   let my_ids = undefined;
   onMount(() => {
-    const url = "/relationships/random.json";
+    const url = "/relationships/htid/random.json";
     my_ids = fetch(url).then((response) => response.json());
   });
 </script>

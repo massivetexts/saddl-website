@@ -3,6 +3,7 @@
   export let level = "volume";
   //export let title;
   import VolumeCard from "$lib/VolumeCard.svelte";
+  import WorkCard from "$lib/WorkCard.svelte";
   let col_count = 3;
 </script>
 
@@ -14,7 +15,8 @@
         {#if level === "volume"}
           <VolumeCard meta={items[i * col_count + j]} />
         {:else}
-          <p>This level not implemented yet.</p>
+          {console.log(items)}
+          <WorkCard meta={items[i * col_count + j]} />
         {/if}
       {/if}
     {/each}
