@@ -50,7 +50,7 @@ export async function neighbors(id) {
   SELECT cp.target, cp.candidate, cp.swsm, cp.swde, cp.wp_dv, cp.partof, cp.contains,
     cp."OVERLAPS" AS "overlaps", cp.author AS authorclass, cp.simdiff, cp.grsim, cp.randdiff,
     cp.relatedness, cp.count, 
-    meta.author, meta.title, meta.description, meta.oclc_num,
+    meta.htid, meta.author, meta.title, meta.description, meta.oclc_num,
     meta.access, meta.rights, meta.ht_bib_key, meta.isbn, meta.issn, meta.page_count,
     meta.lang, meta.bib_fmt, meta.us_gov_doc_flag
   FROM clean_predictions AS cp
