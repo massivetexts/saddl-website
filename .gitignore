@@ -126,5 +126,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
 saddl.duckdb.tmp
 saddl-site
+package-lock.json
