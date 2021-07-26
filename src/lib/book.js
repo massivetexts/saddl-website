@@ -46,9 +46,15 @@ export async function random_books() {
 }
 
 export async function neighbors(id) {
-  const query = `SELECT *
-  FROM clean_predictions 
-  INNER JOIN meta ON (meta.htid = clean_predictions.candidate) 
+  const query = `
+  SELECT cp.target, cp.candidate, cp.swsm, cp.swde, cp.wp_dv, cp.partof, cp.contains,
+    cp."OVERLAPS" AS "overlaps", cp.author AS authorclass, cp.simdiff, cp.grsim, cp.randdiff,
+    cp.relatedness, cp.count, 
+    meta.author, meta.title, meta.description, meta.oclc_num,
+    meta.access, meta.rights, meta.ht_bib_key, meta.isbn, meta.issn, meta.page_count,
+    meta.lang, meta.bib_fmt, meta.us_gov_doc_flag
+  FROM clean_predictions AS cp
+  INNER JOIN meta ON (meta.htid = cp.candidate) 
   WHERE "target"=$1;`;
   const params = [decode(id)];
   const val = run_query(con, query, params);

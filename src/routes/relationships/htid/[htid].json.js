@@ -3,11 +3,11 @@ import { neighbors } from "$lib/book.js";
 function parse_item(meta) {
   /* Parse a single row of relationships to get additional information */
   // TODO author probs missing because of key class with meta
-  meta.diff = meta.grsim + meta.simdiff + meta.randdiff;
+  meta.diff = meta.authorclass + meta.grsim + meta.simdiff + meta.randdiff;
   meta.sw = meta.swsm + meta.swde;
 
-  let probs = (function ({ swsm, swde, wp_dv, partof, contains, OVERLAPS, diff }) {
-    return { swsm, swde, wp_dv, partof, contains, OVERLAPS, diff };
+  let probs = (function ({ swsm, swde, wp_dv, partof, contains, overlaps, diff }) {
+    return { swsm, swde, wp_dv, partof, contains, overlaps, diff };
   })(meta);
 
   meta.guess = Object.keys(probs).reduce((x, y) => (probs[x] > probs[y] ? x : y));
