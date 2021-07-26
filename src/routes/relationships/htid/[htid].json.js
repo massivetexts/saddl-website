@@ -13,16 +13,10 @@ function parse_item(meta) {
   meta.guess = Object.keys(probs).reduce((x, y) => (probs[x] > probs[y] ? x : y));
   return meta;
 }
-/*
-    if (!organized[guess]) {
-      organized[guess] = [];
-    }
-    organized[guess].push(rel);
-    */
 
 function build_dataset(htid, rels) {
   let dataset = { volume: htid };
-  dataset.related_metadata = {
+  let related_metadata = {
     years: [],
     titles: [],
     oclc: [],
@@ -32,7 +26,6 @@ function build_dataset(htid, rels) {
   };
   let relationships = {
     identical_works: [],
-    possibly_identical_works: [],
     other_expressions: [],
     possibly_other_expressions: [],
     other_volumes: [],
@@ -44,22 +37,41 @@ function build_dataset(htid, rels) {
     rel.confidence = rel[rel.guess];
     if (rel.swsm > 0.6) {
       relationships.identical_works.push(rel);
-    } else if (rel.guess === "swsm") {
-      relationships.possibly_identical_works.push(rel);
-    } else if (rel.swde > 0.6) {
+    } else if (rel.guess == "swde" || rel.guess == "swsm") {
       relationships.other_expressions.push(rel);
-    } else if (rel.guess === "swse") {
-      relationships.possibly_other_expressions.push(rel);
+      rel.confidence = rel["sw"];
     } else if (rel.guess == "wp_dv") {
       relationships.other_volumes.push(rel);
     } else if (rel.guess == "contains") {
       relationships.contains.push(rel);
+      if (rel.title) {
+        related_metadata.titles_that_contain.push(rel.title);
+      }
     } else if (rel.guess == "partof") {
       relationships.is_part_of.push(rel);
+      if (rel.title) {
+        related_metadata.titles_within.push(rel.title);
+      }
     }
     // Only use when SWSM + SWDE confidence > 60%
     if (rel.sw > 0.6) {
-      dataset.related_metadata.titles.push(rel.title);
+      if (rel.title) {
+        related_metadata.titles.push(rel.title);
+      }
+      if (rel.rights_date_used) {
+        related_metadata.years.push(rel.rights_date_used);
+      }
+      if (rel.oclc_num) {
+        related_metadata.oclc.push(rel.oclc_num);
+      }
+      if (rel.description) {
+        related_metadata.enumchron.push(rel.description);
+      }
+    }
+
+    // deduplicate
+    for (let key of Object.keys(related_metadata)) {
+      related_metadata[key] = [...new Set(related_metadata[key])];
     }
   }
 
@@ -70,6 +82,7 @@ function build_dataset(htid, rels) {
     }
   }
 
+  dataset.related_metadata = related_metadata;
   dataset.relationships = relationships;
   return dataset;
 }
