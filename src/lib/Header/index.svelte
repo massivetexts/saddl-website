@@ -10,9 +10,6 @@
 
   <nav class="navbar">
     <ul class="navbar-list">
-      <li class="navbar-item" class:active={$page.path === "/catalog"}>
-        <a class="navbar-link" sveltekit:prefetch href="/catalog">Catalog</a>
-      </li>
       <li class="navbar-item" class:active={$page.path === "/relationships/htid"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships/htid">Volumes</a>
       </li>
