@@ -32,6 +32,8 @@ function build_dataset(htid, rels) {
     overlaps: [],
     is_part_of: [],
   };
+
+  //TODO #9 include authors in recommendations
   let recommendations = { books: [], authors: [] };
 
   for (let rel of rels) {

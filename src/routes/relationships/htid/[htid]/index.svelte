@@ -6,6 +6,7 @@
   import { Circle2 } from "svelte-loading-spinners";
   import { onMount } from "svelte";
   import { encode, decode } from "$lib/utils.js";
+  import MetadataList from "$lib/MetadataList.svelte";
   import Slugset from "$lib/Slugset.svelte";
   // An encoded URI component.
   const htid = $page.params.htid;
@@ -63,25 +64,7 @@
 
   <div class="row">
     <div class="one-half column">
-      <dl class="info-list">
-        <dt>Author</dt>
-        <dd>{metadata.author}</dd>
-        <dt>Year</dt>
-        <dd>{metadata.rights_date_used}</dd>
-        <dt>OCLC Number</dt>
-        <dd>{metadata.oclc_num}</dd>
-      </dl>
-      <details class="more">
-        <summary>More</summary>
-        <dl>
-          {#each Object.keys(metadata) as k}
-            {#if !["author", "htid", "title", "work_id", "man_id", "rights_date_used", "oclc_num"].includes(k) && metadata[k]}
-              <dt>{k}</dt>
-              <dd>{metadata[k]}</dd>
-            {/if}
-          {/each}
-        </dl>
-      </details>
+      <MetadataList {metadata} />
     </div>
 
     {#await relationships}
@@ -91,23 +74,19 @@
         <dl>
           {#if data.related_metadata.years.length}
             <dt>Other years</dt>
-            {#each data.related_metadata.years.filter((x) => x != metadata.rights_date_used) as year}
-              <dd>{year}</dd>
-            {/each}
+            <dd>{data.related_metadata.years.filter((x) => x != metadata.rights_date_used).join(", ")}</dd>
           {/if}
           {#if data.related_metadata.oclc.length}
             <!--TODO if oclc numbers overlap with metadata, the previous if doesn't work properly-->
             <dt>Other OCLC numbers</dt>
-            {#each data.related_metadata.oclc.filter((x) => x != metadata.oclc_num) as oclc}
-              <dd>{oclc}</dd>
-            {/each}
+            <dd>{data.related_metadata.oclc.filter((x) => x != metadata.oclc_num).join(", ")}</dd>
           {/if}
-          {#if data.related_metadata.titles.length}
+          <!--{#if data.related_metadata.titles.length}
             <dt>Other titles</dt>
             {#each data.related_metadata.titles.filter((x) => x != metadata.title) as title}
               <dd>{title}</dd>
             {/each}
-          {/if}
+          {/if}-->
         </dl>
         <details class="more">
           <summary>What's this?</summary>
@@ -204,7 +183,7 @@
       </div>
     </div>
 
-    <Slugset items={relationships.recommendations.books} />
+    <Slugset items={relationships.recommendations.books} confidence={false} />
 
     <hr />
   {/if}
@@ -221,35 +200,10 @@
 {/await}
 
 <style>
-  details.more summary {
-    /*border-top: 1px solid #fcc;*/
-    font-size: 11px;
-    letter-spacing: 0.2rem;
-    text-decoration: none;
-    color: #444;
-    font-weight: 500;
-  }
-
-  dl dd {
-    margin-inline-start: 5px;
-  }
-
   summary {
     display: list-item;
     cursor: pointer;
   }
-
-  details.more {
-    /*background: #fffafa;*/
-  }
-  .external_link {
-    text-decoration: none;
-    color: var(--heading-color);
-  }
-  .more dl {
-    margin: 0.5rem 0 1rem 1rem;
-  }
-
   dt {
     font-weight: 700;
     font-size: 90%;
@@ -257,6 +211,7 @@
 
   dd {
     font-size: 85%;
+    margin-inline-start: 5px;
   }
 
   details.related-info {
