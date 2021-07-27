@@ -13,10 +13,16 @@
   //empty promises full of regret.
   let relationships = new Promise(() => {});
   let work_data = new Promise(() => {});
+  let partials = [];
 
-  onMount(() => {
+  onMount(async () => {
     // Can't run until page is mounted.
-    relationships = fetch(`/relationships/htid/${htid}.json`).then((d) => d.json());
+    const res = await fetch(`/relationships/htid/${htid}.json`);
+    relationships = await res.json();
+    partials = []
+      .concat(relationships.relationships.overlaps)
+      .concat(relationships.relationships.contains)
+      .concat(relationships.relationships.is_part_of);
     work_data = fetch(`/catalog/htid/${htid}.json`).then((d) => d.json());
   });
 
@@ -50,7 +56,6 @@
         <dt>HathiTrust ID</dt>
         <dd>
           <a target="_blank" href="https://hdl.handle.net/2027/{decode(metadata.htid)}"> {metadata.htid}</a>
-          <span class="external_link">⇲</span>
         </dd>
       </dl>
     </div>
@@ -83,32 +88,31 @@
       <Circle2 />
     {:then data}
       <div class="one-half column">
-        <h3>Snapshot of Related Metadata</h3>
-        {#if data.related_metadata.years.length}
-          <p>
-            Other years: {data.related_metadata.years
-              .filter((x) => x != metadata.rights_date_used)
-              .map((x) => '"' + x + '"')
-              .join(", ")}
-          </p>
-        {/if}
-        {#if data.related_metadata.oclc.length}
-          <!--TODO if oclc numbers overlap with metadata, the previous if doesn't work properly-->
-          <p>
-            Other OCLC numbers: {data.related_metadata.oclc
-              .filter((x) => x != metadata.oclc_num)
-              .map((x) => '"' + x + '"')
-              .join(", ")}
-          </p>
-        {/if}
-        {#if data.related_metadata.titles.length}
-          <p>
-            Other titles: {data.related_metadata.titles
-              .filter((x) => x != metadata.oclc_num)
-              .map((x) => '"' + x + '"')
-              .join(", ")}
-          </p>
-        {/if}
+        <dl>
+          {#if data.related_metadata.years.length}
+            <dt>Other years</dt>
+            {#each data.related_metadata.years.filter((x) => x != metadata.rights_date_used) as year}
+              <dd>{year}</dd>
+            {/each}
+          {/if}
+          {#if data.related_metadata.oclc.length}
+            <!--TODO if oclc numbers overlap with metadata, the previous if doesn't work properly-->
+            <dt>Other OCLC numbers</dt>
+            {#each data.related_metadata.oclc.filter((x) => x != metadata.oclc_num) as oclc}
+              <dd>{oclc}</dd>
+            {/each}
+          {/if}
+          {#if data.related_metadata.titles.length}
+            <dt>Other titles</dt>
+            {#each data.related_metadata.titles.filter((x) => x != metadata.title) as title}
+              <dd>{title}</dd>
+            {/each}
+          {/if}
+        </dl>
+        <details class="more">
+          <summary>What's this?</summary>
+          These are other titles, years, and identifiers seen for volumes that are likely the same work.
+        </details>
       </div>
     {/await}
   </div>
@@ -173,57 +177,45 @@
     <hr />
   {/if}
 
-  <div class="row">
-    <div class="one-half column">
-      <h3>Partial Overlaps</h3>
-    </div>
-    <div class="one-half column">
-      <p>These volumes <em>contain</em>, <em>are part of</em>, or <em>overlap</em> with <a>Sample Title (v. 2)</a>.</p>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="three columns">
-      <p><strong><a>Work Title (Year)</a></strong></p>
-      <ul>
-        <li>Description</li>
-        <li>Author</li>
-        <li>Relationship: PARTOF</li>
-        <li>Confidence: 75%</li>
-      </ul>
+  {#if partials.length}
+    <div class="row">
+      <div class="one-half column">
+        <h3>Partial Overlaps</h3>
+      </div>
+      <div class="one-half column">
+        <p>
+          These volumes <em>contain</em>, <em>are part of</em>, or <em>overlap</em> with <a>Sample Title (v. 2)</a>.
+        </p>
+      </div>
     </div>
 
-    <div class="three columns">
-      <p><strong><a>Work Title (Year)</a></strong></p>
-      <ul>
-        <li>Description</li>
-        <li>Author</li>
-        <li>Relationship: CONTAINS</li>
-        <li>Confidence: 75%</li>
-      </ul>
+    <Slugset items={partials} />
+
+    <hr />
+  {/if}
+  {#if relationships.recommendations.books.length}
+    <div class="row">
+      <div class="one-half column">
+        <h3>Recommendations</h3>
+      </div>
+      <div class="one-half column">
+        These are content-based recommendations, based on similar <em>topics</em> and <em>themes</em> as the target book.
+        They don't factor a book's popularity or quality, making them a good complement to expert or reader recommendations.
+      </div>
     </div>
 
-    <div class="three columns">
-      <p><strong><a>Work Title (Year)</a></strong></p>
-      <ul>
-        <li>Description</li>
-        <li>Author</li>
-        <li>Relationship: OVERLAPS</li>
-        <li>Confidence: 75%</li>
-      </ul>
-    </div>
-  </div>
+    <Slugset items={relationships.recommendations.books} />
 
-  <hr />
-  <div class="row">
-    <div class="one-half column">
-      <h3>Recommendations</h3>
-    </div>
-  </div>
-  <hr />
+    <hr />
+  {/if}
   <div class="row">
     <div class="one-half column">
       <h3>Download</h3>
+      <ul>
+        <li><a download="{htid}.saddl.js" href="/relationships/htid/{htid}.json">Download JSON dataset file.</a></li>
+        <li><a target="_blank" href="/relationships/htid/{htid}.json">Open in browser.</a></li>
+        <li><a target="_blank" href="https://github.com/massivetexts/saddl-dataset">Full SaDDL dataset.</a></li>
+      </ul>
     </div>
   </div>
 {/await}
@@ -238,7 +230,7 @@
     font-weight: 500;
   }
 
-  dl.ids dd {
+  dl dd {
     margin-inline-start: 5px;
   }
 
@@ -265,5 +257,10 @@
 
   dd {
     font-size: 85%;
+  }
+
+  details.related-info {
+    font-size: 80%;
+    color: #555;
   }
 </style>

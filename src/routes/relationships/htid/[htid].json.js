@@ -27,11 +27,12 @@ function build_dataset(htid, rels) {
   let relationships = {
     identical_works: [],
     other_expressions: [],
-    possibly_other_expressions: [],
     other_volumes: [],
     contains: [],
+    overlaps: [],
     is_part_of: [],
   };
+  let recommendations = { books: [], authors: [] };
 
   for (let rel of rels) {
     rel.confidence = rel[rel.guess];
@@ -47,11 +48,15 @@ function build_dataset(htid, rels) {
       if (rel.title) {
         related_metadata.titles_that_contain.push(rel.title);
       }
+    } else if (rel.guess == "overlaps") {
+      relationships.overlaps.push(rel);
     } else if (rel.guess == "partof") {
       relationships.is_part_of.push(rel);
       if (rel.title) {
         related_metadata.titles_within.push(rel.title);
       }
+    } else {
+      recommendations.books.push(rel);
     }
     // Only use when SWSM + SWDE confidence > 60%
     if (rel.sw > 0.6) {
@@ -82,8 +87,13 @@ function build_dataset(htid, rels) {
     }
   }
 
+  // Filter and sort recommendations
+  // TODO #8 shouldn't return works by the same authors
+  recommendations.books.filter((d) => d.relatedness > 0.05).sort((a, b) => b.relatedness - a.relatedness);
+
   dataset.related_metadata = related_metadata;
   dataset.relationships = relationships;
+  dataset.recommendations = recommendations;
   return dataset;
 }
 
