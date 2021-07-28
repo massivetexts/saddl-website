@@ -36,12 +36,22 @@ export async function metadata(id, level = "htid") {
 
 export async function random_books() {
   const query = `
-  SELECT htid, "title", "meta"."author" author
+  SELECT meta.htid, meta.title, meta.author, meta.description, meta.rights_date_used
   FROM meta
-  WHERE RANDOM() < .00005
-    AND EXISTS(SELECT target FROM clean_predictions b WHERE b."target" = meta.htid)
+  JOIN clusters ON clusters.htid = meta.htid
+  JOIN work_stats ON clusters.work_id = work_stats.work_id
+  WHERE RANDOM() < .0005
+    AND gov_prop < 0.5 AND serial_prop <0.5 AND label_count > 2
   LIMIT 20`;
   const val = run_query(con, query);
+  return { body: JSON.stringify(await val) };
+}
+
+export async function simple_search(q, field) {
+  const query = `SELECT * FROM meta WHERE 
+  to_tsvector('simple', $1) @@ plainto_tsquery('simple', $2) limit 100;
+  `;
+  const val = run_query(con, query, [q, field]);
   return { body: JSON.stringify(await val) };
 }
 
@@ -50,7 +60,7 @@ export async function neighbors(id) {
   SELECT cp.target, cp.candidate, cp.swsm, cp.swde, cp.wp_dv, cp.partof, cp.contains,
     cp."OVERLAPS" AS "overlaps", cp.author AS authorclass, cp.simdiff, cp.grsim, cp.randdiff,
     cp.relatedness, cp.count, 
-    meta.htid, meta.author, meta.title, meta.description, meta.oclc_num,
+    meta.htid, meta.author, meta.title, meta.description, meta.oclc_num, meta.rights_date_used,
     meta.access, meta.rights, meta.ht_bib_key, meta.isbn, meta.issn, meta.page_count,
     meta.lang, meta.bib_fmt, meta.us_gov_doc_flag
   FROM clean_predictions AS cp
