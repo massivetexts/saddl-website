@@ -1,11 +1,12 @@
 <script>
   export let metadata;
-  export let featured = ["author", "rights_date_used", "oclc_num", "htid", "description"]; // metadata fields to feature above the fold
+  export let featured = ["label_count", "author", "rights_date_used", "oclc_num", "htid", "description"]; // metadata fields to feature above the fold
   let pretty_names = {
     author: "Author",
     oclc_num: "OCLC",
     rights_date_used: "Year",
     description: "Description",
+    label_count: "# of volumes in this set",
   };
   //prettier-ignore
   let always_exclude = [
@@ -30,17 +31,18 @@
     <dd>{metadata.guess.toUpperCase()}</dd>
   {/if}
 </dl>
-<details class="more">
-  <summary>More</summary>
-  <dl>
-    {#each Object.keys(metadata) as k}
-      {#if !exclude.includes(k) && metadata[k]}
+<!--ugly-->
+{#if Object.keys(metadata).filter((x) => !exclude.includes(x)).length}
+  <details class="more">
+    <summary>More</summary>
+    <dl>
+      {#each Object.keys(metadata).filter((x) => !exclude.includes(x)) as k}
         <dt>{pretty_names[k] ? pretty_names[k] : k}</dt>
         <dd>{metadata[k]}</dd>
-      {/if}
-    {/each}
-  </dl>
-</details>
+      {/each}
+    </dl>
+  </details>
+{/if}
 
 <style>
   details.more summary {
