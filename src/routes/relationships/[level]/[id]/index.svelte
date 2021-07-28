@@ -8,9 +8,19 @@
   import { decode } from "$lib/utils.js";
   import MetadataList from "$lib/MetadataList.svelte";
   import Slugset from "$lib/Slugset.svelte";
+
   // An encoded URI component.
   const level = $page.params.level;
   const id = $page.params.id;
+
+  let pretty_name;
+  if (level === "htid") {
+    pretty_name = "book";
+  } else if (level == "man") {
+    pretty_name = "manifestation";
+  } else if (level == "work") {
+    pretty_name = "work";
+  }
 
   //empty promises full of regret.
   let relationships = new Promise(() => {});
@@ -27,9 +37,26 @@
       .concat(relationships.relationships.is_part_of);
     work_data = fetch(`/catalog/${level}/${id}.json`).then((d) => d.json());
   });
+  // Header sizing
+  const header_size = function (title_length) {
+    let size;
+    if (title_length < 100) {
+      size = 3.5;
+    } else if (title_length > 500) {
+      size = 2;
+    } else {
+      size = 3.5 - (1.5 * (title_length - 100)) / (400 - 100);
+    }
+    return size.toString() + "rem";
+  };
 
-  // TODO Updates to volume title when it loads
-  $: title = `Volume: ${id}`;
+  // TODO reactive title to include a book name after metadata loads
+  let title;
+  if (level == "work") {
+    title = `SADDL-W${id}`;
+  } else if (level == "htid") {
+    title = `Volume ${id}`;
+  }
 
   const organized = {};
 </script>
@@ -44,15 +71,28 @@
   <div class="row" style="margin-top: 5%">
     <div class="nine columns">
       <!-- If no description, don't include -->
-      <h2>
-        {metadata.title}
-        {#if metadata.description}({metadata.description}){/if}
-      </h2>
+
+      {#if level == "work"}
+        <h2>Work: SADDL-W{id}</h2>
+        <p>
+          A collection of {metadata.label_count} scanned books that all contain "{metadata.title}"
+          {#if metadata.description}({metadata.description}){/if}
+          {#if metadata.author}
+            by <em>{metadata.author}</em>{/if}.
+        </p>
+      {:else}
+        <h2 style="font-size: {header_size(metadata.title.length)};">
+          {metadata.title}
+          {#if metadata.description}({metadata.description}){/if}
+        </h2>
+      {/if}
     </div>
     <div class="three columns">
       <dl class="ids">
-        <dt>Work</dt>
-        <dd><a href="/relationships/work/{metadata.work_id}">SADDL-W{metadata.work_id}</a></dd>
+        {#if level != "work"}
+          <dt>Work</dt>
+          <dd><a href="/relationships/work/{metadata.work_id}">SADDL-W{metadata.work_id}</a></dd>
+        {/if}
         <dt>Manifestation</dt>
         <dd><a href="/relationships/man/{metadata.man_id}">SADDL-M{metadata.man_id}</a>.</dd>
         <dt>HathiTrust ID</dt>
@@ -148,8 +188,9 @@
       </div>
       <div class="one-half column">
         <p>
-          These are books that are likely different volumes of the same target work. Note that these inferences are made
-          based on the <em>content</em> of the book, so it's good to consider the judgments in relation to the metadata also.
+          These are {pretty_name}s that are likely different volumes of the same target work. Note that these inferences
+          are made based on the <em>content</em> of {#if level == "book"}the book{:else}all the books in the {pretty_name}{/if},
+          so it's good to consider the judgments in relation to the metadata also.
         </p>
       </div>
     </div>
@@ -167,11 +208,16 @@
           {#await work_data}
             <Circle2 />
           {:then metadata}
-            These volumes <em>contain</em>, <em>are part of</em>, or <em>overlap</em> with
-            <em>
-              {metadata.title}
-              {#if metadata.description}({metadata.description}){/if}
-            </em>.
+            These {pretty_name}s <em>contain</em>, <em>are part of</em>, or <em>overlap</em> with
+            {#if level == "htid"}
+              <em>
+                {metadata.title}
+                {#if metadata.description}({metadata.description}){/if}
+              </em>
+            {:else if level == "work"}<em>SADDL-W{metadata.work_id}</em>
+            {:else if level == "man"}<em>SADDL-M{metadata.man_id}</em>
+            {/if}
+            .
           {/await}
         </p>
       </div>
@@ -187,8 +233,8 @@
         <h3>Recommendations</h3>
       </div>
       <div class="one-half column">
-        These are content-based recommendations, based on similar <em>topics</em> and <em>themes</em> as the target book.
-        They don't factor a book's popularity or quality, making them a good complement to expert or reader recommendations.
+        These are content-based recommendations, based on similar <em>topics</em> and <em>themes</em> as the target {pretty_name}.
+        They don't factor book popularity or quality, making them a good complement to expert or reader recommendations.
       </div>
     </div>
 
@@ -201,7 +247,7 @@
       <h3>Download</h3>
       <ul>
         <li><a download="{id}.saddl.js" href="/relationships/{level}/{id}.json">Download JSON dataset file.</a></li>
-        <li><a target="_blank" href="/relationships/{level}/{id}.json">Open in browser.</a></li>
+        <li><a target="_blank" href="/relationships/{level}/{id}.json">Open JSON in browser.</a></li>
         <li><a target="_blank" href="https://github.com/massivetexts/saddl-dataset">Full SaDDL dataset.</a></li>
       </ul>
     </div>

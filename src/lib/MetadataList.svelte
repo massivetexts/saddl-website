@@ -6,14 +6,14 @@
     oclc_num: "OCLC",
     rights_date_used: "Year",
     description: "Description",
-    label_count: "# of volumes in this set",
+    label_count: "# of books in this set",
   };
   //prettier-ignore
   let always_exclude = [
     "title", "work_id", "man_id", "rights_date_used", "oclc_num",
     "target", "candidate", "swsm", "swde", "wp_dv", "partof", "contains",
     "overlaps", "authorclass", "simdiff", "grsim", "randdiff",
-    "relatedness", "count", "confidence", "guess", "sw", "diff"
+    "relatedness", "count", "confidence", "guess", "sw", "diff", "include"
   ];
   let exclude = [].concat(always_exclude, featured);
 </script>

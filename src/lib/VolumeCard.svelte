@@ -1,7 +1,8 @@
 <script>
   export let meta;
   export let confidence = true; // whether to include confidence component
-  export let level = "volume";
+  export let level = "htid";
+  export let colwidth = "four";
   import { encode } from "$lib/utils.js";
   import ConfidenceIndicator from "$lib/ConfidenceIndicator.svelte";
   import MetadataList from "$lib/MetadataList.svelte";
@@ -11,14 +12,14 @@
   }
   $: cssVarStyles = `--confidence-opacity:${confidenceOpacity}`;
   let slug;
-  if (level === "volume") {
+  if (level === "htid") {
     slug = "htid/" + encode(meta.htid);
   } else if (level === "work") {
     slug = "work/" + meta.work_id;
   }
 </script>
 
-<div class="four columns volumeCard" style={cssVarStyles}>
+<div class="{colwidth} columns volumeCard" style={cssVarStyles}>
   <p>
     <strong>
       <a href="/relationships/{slug}/">

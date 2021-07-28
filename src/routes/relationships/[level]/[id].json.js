@@ -6,6 +6,24 @@ function parse_item(meta) {
   meta.diff = meta.authorclass + meta.grsim + meta.simdiff + meta.randdiff;
   meta.sw = meta.swsm + meta.swde;
 
+  // recalculated relatedness
+  let relatedness_weights = {
+    swsm: 1,
+    swde: 0.7,
+    wp_dv: 0.7,
+    partof: 0.6,
+    contains: 0.6,
+    overlaps: 0.6,
+    authorclass: 0.3,
+    simdiff: 0.1,
+    grsim: 0.4,
+    randdiff: 0,
+  };
+  let weighted_sum = Object.keys(relatedness_weights)
+    .map((x) => meta[x] * relatedness_weights[x])
+    .reduce((x, y) => x + y);
+  meta.relatedness = weighted_sum / Object.values(relatedness_weights).reduce((x, y) => x + y);
+
   let probs = (function ({ swsm, swde, wp_dv, partof, contains, overlaps, diff }) {
     return { swsm, swde, wp_dv, partof, contains, overlaps, diff };
   })(meta);
@@ -14,8 +32,13 @@ function parse_item(meta) {
   return meta;
 }
 
-function build_dataset(htid, rels) {
-  let dataset = { volume: htid };
+function build_dataset(id, rels, level = "htid") {
+  let dataset = {};
+  if (level == "htid") {
+    dataset["volume"] = id;
+  } else if (level == "work") {
+    dataset["work"] = id;
+  }
   let related_metadata = {
     years: [],
     titles: [],
@@ -91,7 +114,10 @@ function build_dataset(htid, rels) {
 
   // Filter and sort recommendations
   // TODO #8 shouldn't return works by the same authors
-  recommendations.books.filter((d) => d.relatedness > 0.05).sort((a, b) => b.relatedness - a.relatedness);
+  recommendations.books = recommendations.books
+    .filter((d) => d.relatedness > 0.05)
+    .sort((a, b) => b.relatedness - a.relatedness);
+  recommendations.books.length = Math.min(recommendations.books.length, 20);
 
   dataset.related_metadata = related_metadata;
   dataset.relationships = relationships;
@@ -100,9 +126,17 @@ function build_dataset(htid, rels) {
 }
 
 export function get({ params }) {
-  let neighbor = neighbors(params.id);
+  let neighbor = neighbors(params.id, (level = params.level));
   return neighbor.then(function (relationships) {
-    let rels = relationships.map(parse_item);
+    let rels = relationships
+      .filter(function (x) {
+        if ("include" in x) {
+          return x.include;
+        } else {
+          return true;
+        }
+      })
+      .map(parse_item);
     let dataset = build_dataset(params.id, rels);
     return { body: JSON.stringify(dataset) };
   });

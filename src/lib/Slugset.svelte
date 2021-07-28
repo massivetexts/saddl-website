@@ -1,9 +1,17 @@
 <script>
   export let items;
-  export let level = "volume";
+  export let level = "htid";
+  export let col_count = 3;
+  export let confidence;
   //export let title;
   import VolumeCard from "$lib/VolumeCard.svelte";
-  let col_count = 3;
+
+  let colwidth_ref = {
+    1: "twelve",
+    2: "six",
+    3: "four",
+    4: "three",
+  };
 </script>
 
 <!--For tiling, this creates rows of three-->
@@ -11,7 +19,7 @@
   <div class="row">
     {#each { length: col_count } as _, j}
       {#if i * col_count + j < items.length}
-        <VolumeCard meta={items[i * col_count + j]} level="work" />
+        <VolumeCard {confidence} colwidth={colwidth_ref[col_count]} meta={items[i * col_count + j]} {level} />
       {/if}
     {/each}
   </div>

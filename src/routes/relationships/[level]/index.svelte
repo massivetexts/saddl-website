@@ -10,7 +10,7 @@
   let my_ids = new Promise(() => {});
   const level = $page.params.level;
   onMount(async () => {
-    const res = fetch(`/relationships/${level}/random.json`);
+    const res = await fetch(`/relationships/${level}/random.json`);
     my_ids = await res.json();
   });
 </script>
