@@ -7,12 +7,18 @@
   import { Circle2 } from "svelte-loading-spinners";
   import Slugset from "$lib/Slugset.svelte";
 
-  let my_ids = new Promise(() => {});
-  const level = $page.params.level;
-  onMount(async () => {
+  $: level = $page.params.level;
+
+  let my_ids = [];
+  const get_data = async function (level) {
     const res = await fetch(`/relationships/${level}/random.json`);
-    my_ids = await res.json();
-  });
+    return await res.json();
+  };
+  let mounted = false;
+  onMount(() => (mounted = true));
+  $: if (mounted) {
+    my_ids = get_data(level);
+  }
 </script>
 
 <svelte:head>

@@ -10,11 +10,11 @@
   import Slugset from "$lib/Slugset.svelte";
 
   // An encoded URI component.
-  const level = $page.params.level;
-  const id = $page.params.id;
+  $: level = $page.params.level;
+  $: id = $page.params.id;
 
   let pretty_name;
-  if (level === "htid") {
+  $: if (level === "htid") {
     pretty_name = "book";
   } else if (level == "man") {
     pretty_name = "manifestation";
@@ -27,7 +27,10 @@
   let work_data = new Promise(() => {});
   let partials = [];
 
-  onMount(async () => {
+  let mounted = false;
+  onMount(() => (mounted = true));
+
+  const get_data = async function (level) {
     // Can't run until page is mounted.
     const res = await fetch(`/relationships/${level}/${id}.json`);
     relationships = await res.json();
@@ -36,7 +39,12 @@
       .concat(relationships.relationships.contains)
       .concat(relationships.relationships.is_part_of);
     work_data = fetch(`/catalog/${level}/${id}.json`).then((d) => d.json());
-  });
+  };
+
+  $: if (mounted) {
+    get_data(level);
+  }
+
   // Header sizing
   const header_size = function (title_length) {
     let size;
@@ -52,13 +60,11 @@
 
   // TODO reactive title to include a book name after metadata loads
   let title;
-  if (level == "work") {
+  $: if (level == "work") {
     title = `SADDL-W${id}`;
   } else if (level == "htid") {
     title = `Volume ${id}`;
   }
-
-  const organized = {};
 </script>
 
 <svelte:head>
