@@ -63,14 +63,14 @@
   </div>
 
   <div class="row">
-    <div class="one-half column">
+    <div class="three columns">
       <MetadataList {metadata} />
     </div>
 
     {#await relationships}
       <Circle2 />
     {:then data}
-      <div class="one-half column">
+      <div class="nine columns">
         <dl>
           {#if data.related_metadata.years.length}
             <dt>Other years</dt>
@@ -81,12 +81,12 @@
             <dt>Other OCLC numbers</dt>
             <dd>{data.related_metadata.oclc.filter((x) => x != metadata.oclc_num).join(", ")}</dd>
           {/if}
-          <!--{#if data.related_metadata.titles.length}
+          {#if data.related_metadata.titles.length}
             <dt>Other titles</dt>
             {#each data.related_metadata.titles.filter((x) => x != metadata.title) as title}
               <dd>{title}</dd>
             {/each}
-          {/if}-->
+          {/if}
         </dl>
         <details class="more">
           <summary>What's this?</summary>
@@ -163,7 +163,15 @@
       </div>
       <div class="one-half column">
         <p>
-          These volumes <em>contain</em>, <em>are part of</em>, or <em>overlap</em> with <a>Sample Title (v. 2)</a>.
+          {#await work_data}
+            <Circle2 />
+          {:then metadata}
+            These volumes <em>contain</em>, <em>are part of</em>, or <em>overlap</em> with
+            <em>
+              {metadata.title}
+              {#if metadata.description}({metadata.description}){/if}
+            </em>.
+          {/await}
         </p>
       </div>
     </div>
