@@ -1,6 +1,18 @@
 import { con } from "./database.js";
-import { decode, encode } from "./utils.js";
+import { decode } from "./utils.js";
 
+const table_ref = {
+  work: {
+    predictions: "work_predictions",
+    stats: "work_stats",
+    id_col: "work_id",
+  },
+  man: {
+    predictions: "manifestation_predictions",
+    stats: "manifestation_stats",
+    id_col: "man_id",
+  },
+};
 function run_query(con, query, params = []) {
   // Wraps a query as a promise.
   return new Promise((resolve, reject) => {
@@ -26,13 +38,15 @@ export async function metadata(id, level = "htid") {
     query = `SELECT * FROM meta
     JOIN clusters ON clusters.htid = meta.htid
     WHERE clusters.htid=$1;`;
-  } else if (level === "work") {
+  } else if (level === "work" || level === "man") {
+    const { stats, id_col } = table_ref[level];
     query = `SELECT 
-    work_stats.label_count, work_stats.include, work_stats.best_centroid, work_stats.best_centroid_pd,
+    clusters.work_id, clusters.man_id, ${stats}.label_count, ${stats}.include, ${stats}.best_centroid, ${stats}.best_centroid_pd,
     meta.*
-    FROM work_stats
+    FROM ${stats}
     JOIN meta ON meta.htid = best_centroid
-    WHERE work_id = $1;
+    JOIN clusters on clusters.htid = best_centroid
+    WHERE ${stats}.${id_col} = $1;
     `;
   }
   const params = [decode(id)];
@@ -56,14 +70,11 @@ export async function random_books() {
 export async function cluster_members(id, level) {
   let query;
   let meta_cols = "meta.htid, meta.title, meta.author, meta.description, meta.rights_date_used, meta.access, meta.isbn";
-  if (level == "work") {
-    query = `SELECT clusters.man_id, ${meta_cols} FROM clusters 
+  if (level == "work" || level == "man") {
+    const { id_col } = table_ref[level];
+    query = `SELECT clusters.${id_col}, ${meta_cols} FROM clusters 
     JOIN meta ON meta.htid=clusters.htid
     WHERE work_id = $1;`;
-  } else if (level == "manifestation") {
-    query = `SELECT clusters.work_id, ${meta_cols} FROM clusters 
-    JOIN meta ON meta.htid=clusters.htid
-    WHERE man_id = $1;`;
   }
   const val = run_query(con, query, [id]);
   return await val;
@@ -84,6 +95,7 @@ export async function neighbors(id, level = "htid") {
   let meta_cols = `meta.htid, meta.author, meta.title, meta.description, meta.oclc_num, meta.rights_date_used,
   meta.access, meta.rights, meta.ht_bib_key, meta.isbn, meta.issn, meta.page_count,
   meta.lang, meta.bib_fmt, meta.us_gov_doc_flag`;
+
   if (level === "htid") {
     query = `
       SELECT ${prediction_cols}, p."OVERLAPS" AS "overlaps", p.relatedness, ${meta_cols}
@@ -91,13 +103,15 @@ export async function neighbors(id, level = "htid") {
       INNER JOIN meta ON (meta.htid = p.candidate) 
       WHERE "target"=$1;`;
     id = decode(id);
-  } else if (level == "work") {
+  } else if (level == "work" || level == "man") {
+    const { stats, predictions, id_col } = table_ref[level];
+
     query = `
       SELECT ${prediction_cols},
           p."overlaps" AS "overlaps", ${meta_cols}, label_count, include
-      FROM work_predictions AS p
-      JOIN work_stats ON work_stats.work_id = p.candidate
-      JOIN meta ON meta.htid = work_stats.best_centroid
+      FROM ${predictions} AS p
+      JOIN ${stats} ON ${stats}.${id_col} = p.candidate
+      JOIN meta ON meta.htid = ${stats}.best_centroid
       WHERE "target"=$1;`;
   } else {
     //TODO #10 error handling when level is wrong
@@ -107,13 +121,22 @@ export async function neighbors(id, level = "htid") {
   return await val;
 }
 
-export async function random_work_listing() {
+export async function random_work_listing(level = "work") {
   // Right now, this uses the first htid for the work listing. Eventually
   // we can use the 'best' copy or an inferred 'most common title'
+  let id_col;
+  let stats_table;
+  if (level == "work") {
+    id_col = "work_id";
+    stats_table = "work_stats";
+  } else if (level == "man") {
+    id_col = "man_id";
+    stats_table = "manifestation_stats";
+  }
   const query = `
-  SELECT work_stats.work_id, label_count, title, author, description, rights_date_used 
-  FROM work_stats
-  LEFT JOIN clusters ON clusters.work_id = work_stats.work_id
+  SELECT ${stats_table}.${id_col}, label_count, title, author, description, rights_date_used 
+  FROM ${stats_table}
+  LEFT JOIN clusters ON clusters.${id_col} = ${stats_table}.${id_col}
   INNER JOIN meta ON clusters.htid = meta.htid
   WHERE gov_prop < 0.5 AND serial_prop <0.5 AND label_count > 2
     AND RANDOM() < .0005

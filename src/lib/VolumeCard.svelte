@@ -16,6 +16,8 @@
     slug = "htid/" + encode(meta.htid);
   } else if (level === "work") {
     slug = "work/" + meta.work_id;
+  } else if (level === "man") {
+    slug = "man/" + meta.man_id;
   }
 </script>
 

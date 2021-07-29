@@ -30,6 +30,11 @@
 
   A<em>work</em> is the conceptual representation of a book's content. Books that are the same 'work' may be different editions,
   versions, or printings of the same story or content.
+{:else if level == "man"}
+  <h1>Random Manifestations</h1>
+
+  A<em>manifestation</em> is a physical embodiment of a work. Books that are the same 'manifestation' are assumed to be exact
+  duplicates.
 {:else if level == "htid"}
   <h1>Random Books</h1>
 {/if}

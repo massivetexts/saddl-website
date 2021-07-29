@@ -2,7 +2,7 @@
   export let items;
   export let level = "htid";
   export let col_count = 3;
-  export let confidence;
+  export let confidence = true;
   //export let title;
   import VolumeCard from "$lib/VolumeCard.svelte";
 

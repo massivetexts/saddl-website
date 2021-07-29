@@ -38,7 +38,13 @@
       .concat(relationships.relationships.overlaps)
       .concat(relationships.relationships.contains)
       .concat(relationships.relationships.is_part_of);
-    work_data = fetch(`/catalog/${level}/${id}.json`).then((d) => d.json());
+    work_data = fetch(`/catalog/${level}/${id}.json`).then(function (d) {
+      let data = d.json();
+      if (!("members" in data)) {
+        data.members = [];
+      }
+      return data;
+    });
   };
 
   $: if (mounted) {
@@ -62,6 +68,9 @@
   let title;
   $: if (level == "work") {
     title = `SADDL-W${id}`;
+  }
+  $: if (level == "man") {
+    title = `SADDL-M${id}`;
   } else if (level == "htid") {
     title = `Volume ${id}`;
   }
@@ -73,13 +82,21 @@
 
 {#await work_data}
   <Circle2 />
-{:then metadata}
+{:then { metadata, members }}
   <div class="row" style="margin-top: 5%">
     <div class="nine columns">
       <!-- If no description, don't include -->
 
       {#if level == "work"}
         <h2>Work: SADDL-W{id}</h2>
+        <p>
+          A collection of {metadata.label_count} scanned books that all contain "{metadata.title}"
+          {#if metadata.description}({metadata.description}){/if}
+          {#if metadata.author}
+            by <em>{metadata.author}</em>{/if}.
+        </p>
+      {:else if level == "man"}
+        <h2>Manifestation: SADDL-M{id}</h2>
         <p>
           A collection of {metadata.label_count} scanned books that all contain "{metadata.title}"
           {#if metadata.description}({metadata.description}){/if}
@@ -99,8 +116,10 @@
           <dt>Work</dt>
           <dd><a href="/relationships/work/{metadata.work_id}">SADDL-W{metadata.work_id}</a></dd>
         {/if}
-        <dt>Manifestation</dt>
-        <dd><a href="/relationships/man/{metadata.man_id}">SADDL-M{metadata.man_id}</a>.</dd>
+        {#if level != "man"}
+          <dt>Manifestation</dt>
+          <dd><a href="/relationships/man/{metadata.man_id}">SADDL-M{metadata.man_id}</a>.</dd>
+        {/if}
         <dt>HathiTrust ID</dt>
         <dd>
           <a target="_blank" href="https://hdl.handle.net/2027/{decode(metadata.htid)}"> {metadata.htid}</a>
@@ -142,9 +161,21 @@
       </div>
     {/await}
   </div>
+  {#if level == "work" || level == "man"}
+    <hr />
+    <!-- TODO #11 make list of work members into a table -->
+    <div class="row">
+      <div class="one-half column">
+        <h3>Books in this {pretty_name}</h3>
+      </div>
+      <div class="one-half column">
+        <p>These are the books in this set.</p>
+      </div>
+    </div>
+    <Slugset items={members} />
+  {/if}
 {/await}
 <hr />
-
 {#await relationships}
   <Circle2 />
 {:then data}
@@ -161,7 +192,10 @@
       </div>
       <div class="one-half column">
         <p>
-          These volumes are likely an identical printing (i.e. same <em>manifestion</em> in <a>FRBR</a>). The
+          These volumes are likely an identical printing (i.e. same <em>manifestion</em> in
+          <a target="_blank" href="https://en.wikipedia.org/wiki/Functional_Requirements_for_Bibliographic_Records"
+            >FRBR</a
+          >). The
           <em>confidence</em> reflects the strength of the SADDL algorithm's resolve in that judgment.
         </p>
       </div>
@@ -173,11 +207,11 @@
   {#if data.relationships.other_expressions.length}
     <div class="row">
       <div class="one-half column">
-        <h3>Other Work Instances</h3>
+        <h3>Other Books With this Work</h3>
       </div>
       <div class="one-half column">
         <p>
-          These volumes have the same <em>work</em> - that is, the underlying artistic expression - though not
+          These books publish the same <em>work</em> - that is, the underlying artistic expression - though not
           necessarily in an identical version or printing. In FRBR, these may be different <em>expressions</em> and
           <em>manifestions</em> of a work..
         </p>
@@ -190,7 +224,7 @@
   {#if data.relationships.other_volumes.length}
     <div class="row">
       <div class="one-half column">
-        <h3>Different Volumes of This Work</h3>
+        <h3>Different Volumes of This Book</h3>
       </div>
       <div class="one-half column">
         <p>
@@ -273,10 +307,5 @@
   dd {
     font-size: 85%;
     margin-inline-start: 5px;
-  }
-
-  details.related-info {
-    font-size: 80%;
-    color: #555;
   }
 </style>
