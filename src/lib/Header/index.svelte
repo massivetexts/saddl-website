@@ -13,11 +13,9 @@
       <li class="navbar-item" class:active={$page.path === "/relationships/htid"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships/htid">Volumes</a>
       </li>
-      <!--TODO #1 Add Work page-->
       <li class="navbar-item" class:active={$page.path === "/relationships/work"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships/work">Work</a>
       </li>
-      <!--TODO #2 Add manifestation page-->
       <li class="navbar-item" class:active={$page.path === "/relationships/man"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships/man">Manifestation</a>
       </li>
