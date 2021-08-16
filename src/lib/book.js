@@ -84,11 +84,25 @@ export async function cluster_members(id, level) {
   return await val;
 }
 
-export async function simple_search(q) {
+export async function simple_search(q, level = "htid") {
   // The JOIN is just to ensure that we're looking at works with
   // predictions - could be more efficient.
+  let base_select;
+  if (level == "htid") {
+    base_select = `
+    SELECT meta.* FROM meta 
+    JOIN clusters
+    ON meta.htid = clusters.htid`;
+  } else if (level == "work" || level == "man") {
+    const { stats, id_col } = table_ref[level];
+    base_select = `
+    SELECT label_count, ${id_col}, meta.*
+    FROM ${stats}
+    JOIN meta ON meta.htid = ${stats}.best_centroid
+    WHERE include IS TRUE AND label_count > 1`;
+  }
   const query = `SELECT included_meta.*, ts_rank(textsearch, query) as rank
-  FROM (SELECT meta.* FROM meta JOIN clusters ON meta.htid = clusters.htid) included_meta,
+  FROM (${base_select}) included_meta,
         plainto_tsquery('english', $1) query
   WHERE textsearch @@ query
   ORDER BY rank LIMIT 100;
