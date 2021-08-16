@@ -166,7 +166,7 @@
     <!-- TODO #11 make list of work members into a table -->
     <div class="row">
       <div class="one-half column">
-        <h3>Books in this {pretty_name}</h3>
+        <h3>Books in this {pretty_name.charAt(0).toUpperCase() + pretty_name.slice(1)}</h3>
       </div>
       <div class="one-half column">
         <p>These are the books in this set.</p>
@@ -224,7 +224,7 @@
   {#if data.relationships.other_volumes.length}
     <div class="row">
       <div class="one-half column">
-        <h3>Different Volumes of This Book</h3>
+        <h3>Different Volumes of This {pretty_name.charAt(0).toUpperCase() + pretty_name.slice(1)}</h3>
       </div>
       <div class="one-half column">
         <p>
