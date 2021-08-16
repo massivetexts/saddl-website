@@ -47,7 +47,7 @@
     });
   };
 
-  $: if (mounted) {
+  $: if ($page.params.id && mounted) {
     get_data(level);
   }
 

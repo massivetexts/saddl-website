@@ -1,9 +1,10 @@
 <script>
+  import { goto } from "$app/navigation";
+
   let search_query = "";
 
   function searchSubmit() {
-    // is there a better way to handle this? Probably!
-    window.location.href = `/search/${search_query}`;
+    goto(`/search/${search_query}`);
   }
 </script>
 
