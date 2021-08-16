@@ -19,7 +19,13 @@
   <div class="row">
     {#each { length: col_count } as _, j}
       {#if i * col_count + j < items.length}
-        <VolumeCard {confidence} colwidth={colwidth_ref[col_count]} meta={items[i * col_count + j]} {level} />
+        <VolumeCard
+          {confidence}
+          colwidth={colwidth_ref[col_count]}
+          meta={items[i * col_count + j]}
+          {level}
+          rightBorder={j % col_count !== col_count - 1}
+        />
       {/if}
     {/each}
   </div>

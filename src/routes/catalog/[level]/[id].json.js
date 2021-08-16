@@ -11,9 +11,15 @@ export function get({ params }) {
     let members = cluster_members(params.id, params.level);
     let all = Promise.all([meta, members]).then((values) => {
       let dataset;
+      let metadata = values[0][0];
+      let members = values[1];
+      members.map(function (x) {
+        x.best_copy = x.htid === metadata.best_centroid;
+        x.best_copy_pd = x.htid === metadata.best_centroid_pd;
+      });
       dataset = {
-        metadata: values[0][0],
-        members: values[1],
+        metadata: metadata,
+        members: members,
       };
       return { body: JSON.stringify(dataset) };
     });

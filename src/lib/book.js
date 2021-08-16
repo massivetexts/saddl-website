@@ -40,8 +40,10 @@ export async function metadata(id, level = "htid") {
     WHERE clusters.htid=$1;`;
   } else if (level === "work" || level === "man") {
     const { stats, id_col } = table_ref[level];
-    query = `SELECT 
-    clusters.work_id, clusters.man_id, ${stats}.label_count, ${stats}.include, ${stats}.best_centroid, ${stats}.best_centroid_pd,
+    query = `
+    SELECT 
+      clusters.${id_col}, clusters.man_id, ${stats}.label_count, ${stats}.include,
+      ${stats}.best_centroid, ${stats}.best_centroid_pd,
     meta.*
     FROM ${stats}
     JOIN meta ON meta.htid = best_centroid
@@ -72,9 +74,9 @@ export async function cluster_members(id, level) {
   let meta_cols = "meta.htid, meta.title, meta.author, meta.description, meta.rights_date_used, meta.access, meta.isbn";
   if (level == "work" || level == "man") {
     const { id_col } = table_ref[level];
-    query = `SELECT clusters.${id_col}, ${meta_cols} FROM clusters 
+    query = `SELECT ${meta_cols} FROM clusters
     JOIN meta ON meta.htid=clusters.htid
-    WHERE work_id = $1;`;
+    WHERE ${id_col} = $1;`;
   }
   const val = run_query(con, query, [id]);
   return await val;
@@ -124,19 +126,11 @@ export async function neighbors(id, level = "htid") {
 export async function random_work_listing(level = "work") {
   // Right now, this uses the first htid for the work listing. Eventually
   // we can use the 'best' copy or an inferred 'most common title'
-  let id_col;
-  let stats_table;
-  if (level == "work") {
-    id_col = "work_id";
-    stats_table = "work_stats";
-  } else if (level == "man") {
-    id_col = "man_id";
-    stats_table = "manifestation_stats";
-  }
+  const { stats, id_col } = table_ref[level];
   const query = `
-  SELECT ${stats_table}.${id_col}, label_count, title, author, description, rights_date_used 
-  FROM ${stats_table}
-  LEFT JOIN clusters ON clusters.${id_col} = ${stats_table}.${id_col}
+  SELECT ${stats}.${id_col}, label_count, title, author, description, rights_date_used 
+  FROM ${stats}
+  LEFT JOIN clusters ON clusters.${id_col} = ${stats}.${id_col}
   INNER JOIN meta ON clusters.htid = meta.htid
   WHERE gov_prop < 0.5 AND serial_prop <0.5 AND label_count > 2
     AND RANDOM() < .0005
