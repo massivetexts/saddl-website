@@ -113,7 +113,7 @@ export async function simple_search(q, level = "htid") {
 
 export async function neighbors(id, level = "htid") {
   let query;
-  let prediction_cols = `p.target, p.candidate, p.swsm, p.swde, p.wp_dv, p.partof, p.contains,
+  let prediction_cols = `p.swsm, p.swde, p.wp_dv, p.partof, p.contains,
   p.author AS authorclass, p.simdiff, p.grsim, p.randdiff, p.count`;
   let meta_cols = `meta.htid, meta.author, meta.title, meta.description, meta.oclc_num, meta.rights_date_used,
   meta.access, meta.rights, meta.ht_bib_key, meta.isbn, meta.issn, meta.page_count,
@@ -130,12 +130,12 @@ export async function neighbors(id, level = "htid") {
     const { stats, predictions, id_col } = table_ref[level];
 
     query = `
-      SELECT ${prediction_cols},
+      SELECT ${prediction_cols}, ${id_col},
           p."overlaps" AS "overlaps", ${meta_cols}, label_count, include
       FROM ${predictions} AS p
       JOIN ${stats} ON ${stats}.${id_col} = p.candidate
       JOIN meta ON meta.htid = ${stats}.best_centroid
-      WHERE "target"=$1;`;
+      WHERE target != candidate AND "target"=$1;`;
   } else {
     //TODO #10 error handling when level is wrong
   }

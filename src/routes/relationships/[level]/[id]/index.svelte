@@ -166,13 +166,13 @@
     <!-- TODO #11 make list of work members into a table -->
     <div class="row">
       <div class="one-half column">
-        <h3>Books in this {pretty_name.charAt(0).toUpperCase() + pretty_name.slice(1)}</h3>
+        <h3>This <em>{pretty_name.charAt(0).toUpperCase() + pretty_name.slice(1)}</em> contains</h3>
       </div>
       <div class="one-half column">
         <p>These are the books in this set.</p>
       </div>
     </div>
-    <Slugset items={members} />
+    <Slugset level="htid" items={members} />
   {/if}
 {/await}
 <hr />
@@ -188,19 +188,26 @@
   {#if data.relationships.identical_works.length}
     <div class="row">
       <div class="one-half column">
-        <h3>Identical Works</h3>
+        <h3>Duplicates</h3>
       </div>
       <div class="one-half column">
-        <p>
-          These volumes are likely an identical printing (i.e. same <em>manifestion</em> in
-          <a target="_blank" href="https://en.wikipedia.org/wiki/Functional_Requirements_for_Bibliographic_Records"
-            >FRBR</a
-          >). The
-          <em>confidence</em> reflects the strength of the SADDL algorithm's resolve in that judgment.
-        </p>
+        {#if level == "htid"}
+          <p>
+            These volumes are likely an identical printing (i.e. same <em>manifestion</em> in
+            <a target="_blank" href="https://en.wikipedia.org/wiki/Functional_Requirements_for_Bibliographic_Records"
+              >FRBR</a
+            >). The
+            <em>confidence</em> reflects the strength of the SADDL algorithm's resolve in that judgment.
+          </p>
+        {:else}
+          <p>
+            These {pretty_name}s are possibly the same as {level == "work" ? "W" : "M"}{id}, but not with enough
+            confidence to merge together.
+          </p>
+        {/if}
       </div>
     </div>
-    <Slugset items={data.relationships.identical_works} />
+    <Slugset {level} items={data.relationships.identical_works} />
     <hr />
   {/if}
   <!-- End identical works -->
@@ -212,12 +219,13 @@
       <div class="one-half column">
         <p>
           These books publish the same <em>work</em> - that is, the underlying artistic expression - though not
-          necessarily in an identical version or printing. In FRBR, these may be different <em>expressions</em> and
-          <em>manifestions</em> of a work..
+          necessarily in an identical version or printing.
+          {#if level != "work"}In FRBR, these may be different <em>expressions</em> and
+            <em>manifestions</em> of a work.{/if}
         </p>
       </div>
     </div>
-    <Slugset items={data.relationships.other_expressions} />
+    <Slugset {level} items={data.relationships.other_expressions} />
     <hr />
   {/if}
 
@@ -234,7 +242,7 @@
         </p>
       </div>
     </div>
-    <Slugset items={data.relationships.other_volumes} />
+    <Slugset {level} items={data.relationships.other_volumes} />
     <hr />
   {/if}
 
@@ -254,8 +262,8 @@
                 {metadata.title}
                 {#if metadata.description}({metadata.description}){/if}
               </em>
-            {:else if level == "work"}<em>SADDL-W{metadata.work_id}</em>
-            {:else if level == "man"}<em>SADDL-M{metadata.man_id}</em>
+            {:else if level == "work"}<em>SADDL-W{id}</em>
+            {:else if level == "man"}<em>SADDL-M{id}</em>
             {/if}
             .
           {/await}
@@ -263,7 +271,7 @@
       </div>
     </div>
 
-    <Slugset items={partials} />
+    <Slugset {level} items={partials} />
 
     <hr />
   {/if}
@@ -278,7 +286,7 @@
       </div>
     </div>
 
-    <Slugset items={relationships.recommendations.books} confidence={false} />
+    <Slugset {level} items={relationships.recommendations.books} confidence={false} />
 
     <hr />
   {/if}

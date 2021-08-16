@@ -64,7 +64,13 @@ function build_dataset(id, rels, level = "htid") {
     if (rel.swsm > 0.6) {
       relationships.identical_works.push(rel);
     } else if (rel.guess == "swde" || rel.guess == "swsm") {
-      relationships.other_expressions.push(rel);
+      if (level == "work") {
+        // If operating on the work level, there shouldn't be a distinction between
+        // between swde and swsm - they're all considered SW!
+        relationships.identical_works.push(rel);
+      } else {
+        relationships.other_expressions.push(rel);
+      }
       rel.confidence = rel["sw"];
     } else if (rel.guess == "wp_dv") {
       relationships.other_volumes.push(rel);
@@ -137,7 +143,7 @@ export function get({ params }) {
         }
       })
       .map(parse_item);
-    let dataset = build_dataset(params.id, rels);
+    let dataset = build_dataset(params.id, rels, (level = params.level));
     return { body: JSON.stringify(dataset) };
   });
 }

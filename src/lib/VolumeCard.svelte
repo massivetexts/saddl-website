@@ -13,7 +13,8 @@
   }
   $: cssVarStyles = `--confidence-opacity:${confidenceOpacity}`;
   let slug;
-  if (level === "htid") {
+
+  $: if (level === "htid") {
     slug = "htid/" + encode(meta.htid);
   } else if (level === "work") {
     slug = "work/" + meta.work_id;

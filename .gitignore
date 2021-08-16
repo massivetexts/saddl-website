@@ -129,3 +129,4 @@ dist
 
 saddl.duckdb.tmp
 saddl-site
+.vscode/settings.json
