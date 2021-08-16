@@ -25,7 +25,7 @@ function run_query(con, query, params = []) {
       }
       if (res && res.rows && res.rows.length) {
         resolve(res.rows);
-      } else if (!res.rows.length) {
+      } else if (res && res.rows && !res.rows.length) {
         reject("Empty results.");
       } else {
         reject("query failed.");
@@ -89,7 +89,7 @@ export async function simple_search(q) {
   // predictions - could be more efficient.
   const query = `SELECT included_meta.*, ts_rank(textsearch, query) as rank
   FROM (SELECT meta.* FROM meta JOIN clusters ON meta.htid = clusters.htid) included_meta,
-        to_tsquery('english', $1) query
+        plainto_tsquery('english', $1) query
   WHERE textsearch @@ query
   ORDER BY rank LIMIT 100;
   `;

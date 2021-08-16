@@ -1,5 +1,6 @@
 <script>
   import { page } from "$app/stores";
+  import SearchBar from "$lib/SearchBar.svelte";
 </script>
 
 <header>
@@ -21,11 +22,8 @@
       </li>
       <!--TODO #4 Add About page -->
     </ul>
+    <SearchBar />
   </nav>
-
-  <div class="corner">
-    <!-- TODO #3 Add search box -->
-  </div>
 </header>
 
 <style>
@@ -37,6 +35,7 @@
     color: #777;
     font-size: 15px;
   }
+
   .bighead a {
     text-decoration: none;
     color: black;
