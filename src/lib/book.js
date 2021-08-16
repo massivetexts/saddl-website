@@ -25,6 +25,8 @@ function run_query(con, query, params = []) {
       }
       if (res && res.rows && res.rows.length) {
         resolve(res.rows);
+      } else if (!res.rows.length) {
+        reject("Empty results.");
       } else {
         reject("query failed.");
       }
@@ -82,11 +84,16 @@ export async function cluster_members(id, level) {
   return await val;
 }
 
-export async function simple_search(q, field) {
-  const query = `SELECT * FROM meta WHERE 
-  to_tsvector('simple', $1) @@ plainto_tsquery('simple', $2) limit 100;
+export async function simple_search(q) {
+  // The JOIN is just to ensure that we're looking at works with
+  // predictions - could be more efficient.
+  const query = `SELECT included_meta.*, ts_rank(textsearch, query) as rank
+  FROM (SELECT meta.* FROM meta JOIN clusters ON meta.htid = clusters.htid) included_meta,
+        to_tsquery('english', $1) query
+  WHERE textsearch @@ query
+  ORDER BY rank LIMIT 100;
   `;
-  const val = run_query(con, query, [q, field]);
+  const val = run_query(con, query, [q]);
   return await val;
 }
 
