@@ -144,7 +144,7 @@ export async function neighbors(id, level = "htid") {
   return await val;
 }
 
-export async function random_work_listing(level = "work") {
+export async function random_work_listing(level="work") {
   // Right now, this uses the first htid for the work listing. Eventually
   // we can use the 'best' copy or an inferred 'most common title'
   const { stats, id_col } = table_ref[level];

@@ -5,7 +5,7 @@ export function get({ params }) {
       return { body: JSON.stringify(x) };
     });
   } else if (params.level == "work" || params.level == "man") {
-    return random_work_listing((level = params.level)).then(function (x) {
+    return random_work_listing(params.level).then(function (x) {
       return { body: JSON.stringify(x) };
     });
   }

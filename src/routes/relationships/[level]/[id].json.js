@@ -132,7 +132,7 @@ function build_dataset(id, rels, level = "htid") {
 }
 
 export function get({ params }) {
-  let neighbor = neighbors(params.id, (level = params.level));
+  let neighbor = neighbors(params.id, params.level);
   return neighbor.then(function (relationships) {
     let rels = relationships
       .filter(function (x) {
@@ -143,7 +143,7 @@ export function get({ params }) {
         }
       })
       .map(parse_item);
-    let dataset = build_dataset(params.id, rels, (level = params.level));
+    let dataset = build_dataset(params.id, rels, params.level);
     return { body: JSON.stringify(dataset) };
   });
 }
