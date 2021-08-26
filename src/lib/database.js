@@ -1,12 +1,10 @@
-import * as pg from "pg";
-const { Pool, Client } = pg;
+import pkg from 'pg';
+const { native } = pkg;
 
 console.log("Regenerating database connection");
-export const client = new Client({
-  user: "saddl",
+export const client = new native.Client({
   host: "localhost",
   database: "saddl",
-  //password: 'secretpassword',
   port: 5432, //default postgres port
 });
 client.connect();

@@ -1,5 +1,7 @@
 <script>
   import Header from "$lib/Header/index.svelte";
+  import "../normalize.css";
+  import "../skeleton.css";
   import "../app.css";
 </script>
 

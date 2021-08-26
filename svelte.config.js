@@ -7,9 +7,12 @@ const config = {
     adapter: node(),
     target: "#svelte",
     vite: {
-      define: {
-        //				'process.env': {}
-      },
+	    optimizeDeps: {
+		    include: ['pg', 'pg-native']
+	    },
+	    ssr: {
+		    noExternal: []
+	    }
     },
   },
 };
