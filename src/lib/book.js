@@ -42,18 +42,24 @@ export async function metadata(id, level = "htid") {
     WHERE clusters.htid=$1;`;
   } else if (level === "work" || level === "man") {
     const { stats, id_col } = table_ref[level];
+    // Note the clusters JOIN. It joins with the first row of any given dupe. In the future,
+    // metadata should come from best_centroid, even for groups of 1
+    // and joined with LEFT JOIN clusters on clusters.htid = best_centroid, and the meta JOIN
+    // can be on best_centroid
     query = `
     SELECT 
       clusters.*, ${stats}.label_count, ${stats}.include,
       ${stats}.best_centroid, ${stats}.best_centroid_pd,
     meta.*
     FROM ${stats}
-    LEFT JOIN meta ON meta.htid = best_centroid
-    JOIN clusters on clusters.htid = best_centroid
+    LEFT JOIN (SELECT DISTINCT ON(${id_col}) * FROM clusters) clusters 
+      ON clusters.${id_col} = ${stats}.${id_col}
+    LEFT JOIN meta ON meta.htid = clusters.htid
     WHERE ${stats}.${id_col} = $1;
     `;
   }
   const params = [decode(id)];
+  console.log(query);
   const val = run_query(con, query, params);
   return await val;
 }
