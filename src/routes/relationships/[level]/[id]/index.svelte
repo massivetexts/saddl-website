@@ -117,9 +117,9 @@
           <dd><a href="/relationships/work/{metadata.work_id}">SADDL-W{metadata.work_id}</a></dd>
         {/if}
         <!-- TODO: #13 Add manifestations listing for works -->
-        {#if level != "man" || level != "work"}
+        {#if level != "man" && level != "work"}
           <dt>Manifestation</dt>
-          <dd><a href="/relationships/man/{metadata.man_id}">SADDL-M{metadata.man_id}</a>.</dd>
+          <dd><a href="/relationships/man/{metadata.man_id}">SADDL-M{metadata.man_id}</a></dd>
         {/if}
         <!-- TODO: #12 Add listing of all HTIDs for Manifestations/Works-->
         {#if level == "htid"}
