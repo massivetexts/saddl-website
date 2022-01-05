@@ -11,13 +11,13 @@
 
   <nav class="navbar">
     <ul class="navbar-list">
-      <li class="navbar-item" class:active={$page.path === "/relationships/htid"}>
+      <li class="navbar-item" class:active={$page.url.pathname === "/relationships/htid"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships/htid">Volumes</a>
       </li>
-      <li class="navbar-item" class:active={$page.path === "/relationships/work"}>
+      <li class="navbar-item" class:active={$page.url.pathname === "/relationships/work"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships/work">Work</a>
       </li>
-      <li class="navbar-item" class:active={$page.path === "/relationships/man"}>
+      <li class="navbar-item" class:active={$page.url.pathname === "/relationships/man"}>
         <a class="navbar-link" sveltekit:prefetch href="/relationships/man">Manifestation</a>
       </li>
       <!--TODO #4 Add About page -->
