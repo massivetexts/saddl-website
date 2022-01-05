@@ -54,7 +54,6 @@ export async function metadata(id, level = "htid") {
     `;
   }
   const params = [decode(id)];
-  console.log(query);
   const val = run_query(con, query, params);
   return await val;
 }
