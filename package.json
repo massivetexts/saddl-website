@@ -17,7 +17,6 @@
     "mock-aws-s3": "^4.0.2",
     "nock": "^13.1.0",
     "pg": "^8.7.1",
-    "pg-native": "^3.0.0",
     "svelte": "^3.34.0",
     "svelte-loading-spinners": "^0.1.7",
     "svelte-preprocess": "^4.8.0"
@@ -26,6 +25,7 @@
   "dependencies": {
     "@fontsource/fira-mono": "^4.2.2",
     "@lukeed/uuid": "^2.0.0",
-    "cookie": "^0.4.1"
+    "cookie": "^0.4.1",
+    "pg-native": "^3.0.0"
   }
 }

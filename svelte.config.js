@@ -7,12 +7,12 @@ const config = {
     adapter: node(),
     target: "#svelte",
     vite: {
-	    optimizeDeps: {
-		    include: ['pg', 'pg-native']
-	    },
-	    ssr: {
-		    noExternal: []
-	    }
+      optimizeDeps: {
+        include: ["pg", "pg-native"],
+      },
+      ssr: {
+        noExternal: [],
+      },
     },
   },
 };
