@@ -17,6 +17,10 @@ export function get({ params }) {
         x.best_copy = x.htid === metadata.best_centroid;
         x.best_copy_pd = x.htid === metadata.best_centroid_pd;
       });
+      if (metadata.htid == null) {
+        // if there's no best centroid, use the first member's metadata
+        metadata = Object.assign(metadata, members[0]);
+      }
       dataset = {
         metadata: metadata,
         members: members,

@@ -93,7 +93,7 @@
           A collection of {metadata.label_count} scanned books that all contain "{metadata.title}"
           {#if metadata.description}({metadata.description}){/if}
           {#if metadata.author}
-            by <em>{metadata.author}</em>{/if}.
+            by <em>{metadata.author}</em>{/if}
         </p>
       {:else if level == "man"}
         <h2>Manifestation: SADDL-M{id}</h2>
@@ -101,7 +101,7 @@
           A collection of {metadata.label_count} scanned books that all contain "{metadata.title}"
           {#if metadata.description}({metadata.description}){/if}
           {#if metadata.author}
-            by <em>{metadata.author}</em>{/if}.
+            by <em>{metadata.author}</em>{/if}
         </p>
       {:else}
         <h2 style="font-size: {header_size(metadata.title.length)};">
@@ -116,14 +116,18 @@
           <dt>Work</dt>
           <dd><a href="/relationships/work/{metadata.work_id}">SADDL-W{metadata.work_id}</a></dd>
         {/if}
-        {#if level != "man"}
+        <!-- TODO: #13 Add manifestations listing for works -->
+        {#if level != "man" || level != "work"}
           <dt>Manifestation</dt>
           <dd><a href="/relationships/man/{metadata.man_id}">SADDL-M{metadata.man_id}</a>.</dd>
         {/if}
-        <dt>HathiTrust ID</dt>
-        <dd>
-          <a target="_blank" href="https://hdl.handle.net/2027/{decode(metadata.htid)}"> {metadata.htid}</a>
-        </dd>
+        <!-- TODO: #12 Add listing of all HTIDs for Manifestations/Works-->
+        {#if level == "htid"}
+          <dt>HathiTrust ID</dt>
+          <dd>
+            <a target="_blank" href="https://hdl.handle.net/2027/{decode(metadata.htid)}"> {metadata.htid}</a>
+          </dd>
+        {/if}
       </dl>
     </div>
   </div>

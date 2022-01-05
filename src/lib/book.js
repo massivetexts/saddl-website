@@ -44,16 +44,17 @@ export async function metadata(id, level = "htid") {
     const { stats, id_col } = table_ref[level];
     query = `
     SELECT 
-      clusters.${id_col}, clusters.man_id, ${stats}.label_count, ${stats}.include,
+      ${stats}.${id_col}, ${stats}.label_count, ${stats}.include,
       ${stats}.best_centroid, ${stats}.best_centroid_pd,
     meta.*
     FROM ${stats}
-    JOIN meta ON meta.htid = best_centroid
-    JOIN clusters on clusters.htid = best_centroid
+    LEFT JOIN meta ON meta.htid = best_centroid
+    LEFT JOIN clusters on clusters.htid = best_centroid
     WHERE ${stats}.${id_col} = $1;
     `;
   }
   const params = [decode(id)];
+  console.log(query);
   const val = run_query(con, query, params);
   return await val;
 }
@@ -144,7 +145,7 @@ export async function neighbors(id, level = "htid") {
   return await val;
 }
 
-export async function random_work_listing(level="work") {
+export async function random_work_listing(level = "work") {
   // Right now, this uses the first htid for the work listing. Eventually
   // we can use the 'best' copy or an inferred 'most common title'
   const { stats, id_col } = table_ref[level];
