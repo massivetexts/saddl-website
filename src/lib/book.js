@@ -44,12 +44,12 @@ export async function metadata(id, level = "htid") {
     const { stats, id_col } = table_ref[level];
     query = `
     SELECT 
-      ${stats}.${id_col}, ${stats}.label_count, ${stats}.include,
+      clusters.*, ${stats}.label_count, ${stats}.include,
       ${stats}.best_centroid, ${stats}.best_centroid_pd,
     meta.*
     FROM ${stats}
     LEFT JOIN meta ON meta.htid = best_centroid
-    LEFT JOIN clusters on clusters.htid = best_centroid
+    JOIN clusters on clusters.htid = best_centroid
     WHERE ${stats}.${id_col} = $1;
     `;
   }
